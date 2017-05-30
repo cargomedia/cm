@@ -13,7 +13,6 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertTrue(CM_Model_LanguageKey::exists('foo'));
         $this->assertCount(1, $language->getTranslations());
         $this->assertSame(['bar'], $languageKey->getVariables());
-        $this->assertSame('0beec7b5ea3f0fdbc95d0dd47f3c5bc275da8a33', $languageKey->getNameHash());
     }
 
     public function testCreateDuplicate() {
@@ -159,6 +158,6 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
         $this->assertSame('Duplicate languageKey name', $exception->getMessage());
-        $this->assertSame(['name' => 'bar', 'hash' => $key2->getNameHash()], $exception->getMetaInfo());
+        $this->assertSame(['name' => 'bar', 'hash' => CM_Model_LanguageKey::calculateHash('bar')], $exception->getMetaInfo());
     }
 }
