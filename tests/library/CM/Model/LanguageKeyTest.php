@@ -156,8 +156,6 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $exception = $this->catchException(function () use ($key1) {
             $key1->setName('bar');
         });
-        $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
-        $this->assertSame('Duplicate languageKey name', $exception->getMessage());
-        $this->assertSame(['name' => 'bar', 'hash' => CM_Model_LanguageKey::calculateHash('bar')], $exception->getMetaInfo());
+        $this->assertInstanceOf(CM_Db_Exception::class, $exception);
     }
 }

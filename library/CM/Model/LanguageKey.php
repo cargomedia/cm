@@ -13,18 +13,13 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
 
     /**
      * @param string $name
-     * @throws CM_Exception_Invalid
      */
     public function setName($name) {
         $hash = self::calculateHash($name);
-        try {
-            $this->_set([
-                'nameHash' => $hash,
-                'name'     => $name,
-            ]);
-        } catch (CM_Db_Exception $e) {
-            throw new CM_Exception_Invalid('Duplicate languageKey name', null, ['name' => $name, 'hash' => $hash]);
-        }
+        $this->_set([
+            'nameHash' => $hash,
+            'name'     => $name,
+        ]);
         $this->_changeContainingCacheables();
     }
 
