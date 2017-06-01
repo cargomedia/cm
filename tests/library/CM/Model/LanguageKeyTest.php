@@ -15,14 +15,12 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
         $this->assertSame(['bar'], $languageKey->getVariables());
     }
 
-    public function testCreateRemoveDuplicates() {
+    public function testCreateDuplicate() {
         $languageKeyFirst = CM_Model_LanguageKey::create('foo', ['bar']);
         $languageKeySecond = CM_Model_LanguageKey::create('foo', ['foo']);
 
         $this->assertEquals($languageKeyFirst, $languageKeySecond);
         $this->assertEquals(['bar'], $languageKeySecond->getVariables());
-
-        $this->assertSame(1, CM_Db_Db::count('cm_model_languagekey', ['name' => 'foo']));
     }
 
     public function testSetGetVariables() {
@@ -140,11 +138,24 @@ class CM_Model_LanguageKeyTest extends CMTest_TestCase {
     public function testSetName() {
         $language = CMTest_TH::createLanguage();
         $key = CM_Model_LanguageKey::create('foo');
+        $this->assertSame('foo', $key->getName());
 
         $key->setName('bar');
         $this->assertSame('bar', $key->getName());
         $this->assertTrue(Functional\some($language->getTranslations()->getItems(), function ($translation) {
             return $translation['key'] === 'bar';
         }));
+    }
+
+    public function testSetNameDuplicateHash() {
+        $key1 = CM_Model_LanguageKey::create('foo');
+        $key2 = CM_Model_LanguageKey::create('bar');
+
+        $this->assertSame('foo', $key1->getName());
+        /** @var CM_Exception_Invalid $exception */
+        $exception = $this->catchException(function () use ($key1) {
+            $key1->setName('bar');
+        });
+        $this->assertInstanceOf(CM_Db_Exception::class, $exception);
     }
 }
