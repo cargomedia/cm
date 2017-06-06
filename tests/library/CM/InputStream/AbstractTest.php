@@ -20,10 +20,8 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
     }
 
     public function testReadWithValidateCallback() {
-        $output = $this->mockObject('CM_OutputStream_Abstract');
-        $writeMethod = $output->mockMethod('writeln')->set(function ($content) {
-            $this->assertSame('message', $content);
-        });
+        $output = $this->getMockBuilder('CM_OutputStream_Abstract')->setMethods(['writeln'])->getMockForAbstractClass();
+        $output->expects($this->once())->method('writeln')->with('message');
 
         $input = $this->mockObject('CM_InputStream_Abstract');
         $input->mockMethod('_getStreamOutput')->set($output);
@@ -39,7 +37,6 @@ class CM_InputStream_AbstractTest extends CMTest_TestCase {
         }));
 
         $this->assertSame(2, $readMethod->getCallCount());
-        $this->assertSame(1, $writeMethod->getCallCount());
     }
 
     public function testConfirm() {
