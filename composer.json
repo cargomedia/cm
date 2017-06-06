@@ -41,7 +41,6 @@
     "psr-4": {
       "CM\\": "library/CM/",
       "CMService\\": "library/CMService/"
-
     }
   },
   "autoload-dev": {
