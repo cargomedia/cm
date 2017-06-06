@@ -4,10 +4,10 @@ class CM_Model_StreamChannel_Message_UserTest extends CMTest_TestCase {
 
     public function testOnUnsubscribe() {
         $user = CMTest_TH::createUser();
-        $delayedQueue = $this->mockObject('CM_Jobdistribution_DelayedQueue');
-        $addJobMock = $delayedQueue->mockMethod('addJob')->set(function (CM_Jobdistribution_Job_Abstract $job, array $params, $executeAt) use ($user) {
-            $this->assertInstanceOf('CM_User_OfflineJob', $job);
-            $this->assertEquals(['user' => $user], $params);
+        $delayedQueue = $this->mockObject(CM_Jobdistribution_DelayedQueue::class);
+        $addJobMock = $delayedQueue->mockMethod('addJob')->set(function (CM_Jobdistribution_Job_Abstract $job, $executeAt) use ($user) {
+            $this->assertInstanceOf(CM_User_OfflineJob::class, $job);
+            $this->assertEquals(['user' => $user], $job->getParams()->getParamsDecoded());
             $this->assertSame(CM_Model_User::OFFLINE_DELAY, $executeAt);
         });
         $this->getServiceManager()->replaceInstance('delayedJobQueue', $delayedQueue);

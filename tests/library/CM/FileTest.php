@@ -267,7 +267,7 @@ class CM_FileTest extends CMTest_TestCase {
      * @expectedException CM_Exception_Invalid
      */
     public function testGetPathOnLocalFilesystemUnexpectedFilesystem() {
-        $clientMock = $this->getMockBuilder('Aws\S3\S3Client')->disableOriginalConstructor()->getMock();
+        $clientMock = $this->getMockBuilder(Aws\S3\S3Client::class)->disableOriginalConstructor()->getMock();
         $filesystem = new CM_File_Filesystem(new CM_File_Filesystem_Adapter_AwsS3($clientMock, 'bucket'));
         $file = new CM_File('foo', $filesystem);
 

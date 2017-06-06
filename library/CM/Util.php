@@ -99,10 +99,11 @@ class CM_Util {
      * @param array|null   $params
      * @param boolean|null $methodPost
      * @param int|null     $timeout
+     * @param array|null   $header
      * @throws CM_Exception_Invalid
      * @return string
      */
-    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null) {
+    public static function getContents($url, array $params = null, $methodPost = null, $timeout = null, array $headers = null) {
         $url = (string) $url;
         if (!empty($params)) {
             $params = http_build_query($params);
@@ -126,6 +127,9 @@ class CM_Util {
             if (!empty($params)) {
                 $url .= '?' . $params;
             }
+        }
+        if ($headers) {
+            curl_setopt($curlConnection, CURLOPT_HTTPHEADER, $headers);
         }
         curl_setopt($curlConnection, CURLOPT_URL, $url);
 
@@ -164,33 +168,6 @@ class CM_Util {
         }
 
         return $xml;
-    }
-
-    /**
-     * @param string      $path
-     * @param array       $params Query parameters
-     * @param string|null $fragment
-     * @return string
-     */
-    public static function link($path, array $params = null, $fragment = null) {
-        $path = (string) $path;
-        $fragment = (string) $fragment;
-
-        $link = $path;
-
-        if (!empty($params)) {
-            $params = CM_Params::encode($params);
-            $query = http_build_query($params);
-            if (strlen($query) > 0) {
-                $link .= '?' . $query;
-            }
-        }
-
-        if ('' !== $fragment) {
-            $link .= '#' . $fragment;
-        }
-
-        return $link;
     }
 
     /**

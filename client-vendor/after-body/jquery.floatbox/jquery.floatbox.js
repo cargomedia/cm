@@ -82,7 +82,10 @@
       $(window).on('resize.floatbox', this.windowResizeCallback);
       this.repaint();
 
-      self.$floatbox.addClass('fadeIn');
+      _.defer(function() {
+        self.$floatbox.addClass('fadeIn');
+      });
+      
       $floatboxContainer.add($floatboxOverlay).addClass('fadeIn').on('click.floatbox', function(e) {
         if (this === e.target) {
           self.close.apply(self);
@@ -96,7 +99,7 @@
       this.$floatbox.trap();
 
       this.$layer.data('floatbox', this);
-      $element.trigger('floatbox-open');
+      $element.triggerHandler('floatbox-open');
     },
     close: function() {
       if (!this.options.closable) {
@@ -106,7 +109,7 @@
       if (this.$parent.length) {
         this.$parent.append($element);
       }
-      this.$floatbox.trigger('floatbox-close');
+      this.$floatbox.triggerHandler('floatbox-close');
       this.$layer.remove();
       $viewport.children('.floatbox-layer:last').addClass('active');
       if (lastFocusedElement) {
@@ -122,7 +125,7 @@
         $body.css({top: 0, left: 0});
       }
       $(window).off('resize.floatbox', this.windowResizeCallback);
-      $element.trigger('floatbox-close');
+      $element.triggerHandler('floatbox-close');
 
       this.$parent = null;
       this.$floatbox = null;

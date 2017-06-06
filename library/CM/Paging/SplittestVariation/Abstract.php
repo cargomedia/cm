@@ -19,4 +19,17 @@ abstract class CM_Paging_SplittestVariation_Abstract extends CM_Paging_Abstract 
         }
         return null;
     }
+
+    /**
+     * @param string $name
+     * @return CM_Model_SplittestVariation
+     * @throws CM_Exception_Nonexistent
+     */
+    public function getByName($name) {
+        $variation = $this->findByName($name);
+        if (!$variation) {
+            throw new CM_Exception_Nonexistent('Variation not found', null, ['name' => $name]);
+        }
+        return $variation;
+    }
 }

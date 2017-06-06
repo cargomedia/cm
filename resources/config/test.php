@@ -12,8 +12,6 @@ return function (CM_Config_Node $config) {
 
     $config->classConfigCacheEnabled = false;
 
-    $config->CM_Jobdistribution_Job_Abstract->gearmanEnabled = false;
-
     $config->services['database-master'] =
     $config->services['database-read'] =
     $config->services['database-read-maintenance'] = array(
@@ -74,6 +72,12 @@ return function (CM_Config_Node $config) {
         ),
     );
 
+    $config->services[CM_Jobdistribution_QueueInterface::class] = [
+        'class'  => CMTest_Factory_JobDistribution::class,
+        'method' => ['name' => 'createQueue'],
+    ];
+
+    $config->CMService_AwsS3Versioning_ClientTest->version = '2006-03-01';
     $config->CMService_AwsS3Versioning_ClientTest->region = 'eu-west-1';
     $config->CMService_AwsS3Versioning_ClientTest->key = null;
     $config->CMService_AwsS3Versioning_ClientTest->secret = null;

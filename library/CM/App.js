@@ -169,14 +169,7 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlStatic: function(path) {
-    var url = '';
-    if (cm.options.urlCdn) {
-      url = cm.options.urlCdn + url;
-    } else {
-      url = cm.options.urlBase + url;
-    }
-
-    url += '/static';
+    var url = cm.options.urlCdn + '/static';
     if (path) {
       url += path + '?' + cm.options.deployVersion;
     }
@@ -187,21 +180,10 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @param {String} type
    * @param {String} path
-   * @param {Object} [options]
    * @return {String}
    */
-  getUrlResource: function(type, path, options) {
-    options = _.defaults(options || {}, {
-      'sameOrigin': false
-    });
-
-    var url = '';
-    if (!options['sameOrigin'] && cm.options.urlCdn) {
-      url = cm.options.urlCdn + url;
-    } else {
-      url = cm.options.urlBase + url;
-    }
-
+  getUrlResource: function(type, path) {
+    var url = cm.options.urlCdn;
     if (type && path) {
       var urlParts = [];
       urlParts.push(type);
@@ -471,7 +453,6 @@ var CM_App = CM_Class_Abstract.extend({
      */
     setup: function($dom) {
       $dom.find('.timeago').timeago();
-      $dom.find('textarea.autosize, .autosize textarea').autosize({append: ''});
       $dom.find('.clipSlide').clipSlide();
       $dom.find('.toggleNext').toggleNext();
       $dom.find('.tabs').tabs();
@@ -503,7 +484,6 @@ var CM_App = CM_Class_Abstract.extend({
     teardown: function($dom) {
       $dom.find('.openerDropdown').opener('close');
       $dom.find('.timeago').timeago('dispose');
-      $dom.find('textarea.autosize, .autosize textarea').trigger('autosize.destroy');
       $dom.find('img.lazy').trigger('destroy.unveil');
     },
 
@@ -1297,7 +1277,7 @@ var CM_App = CM_Class_Abstract.extend({
           return;
         }
         router.hrefInitialIgnore = null;
-        router._handleLocationChange(location.href);
+        router._navigateToUrl(location.href);
       });
 
       var urlSite = cm.getUrl();
@@ -1342,7 +1322,7 @@ var CM_App = CM_Class_Abstract.extend({
           this.pushState(fragment);
         }
       }
-      return this._handleLocationChange(url);
+      return this._navigateToUrl(url);
     },
 
     /**
@@ -1394,6 +1374,23 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getFragmentByUrl: function(url) {
       return this._getFragmentByLocation(this._getLocationByUrl(url));
+    },
+
+    /**
+     * @param {String} url
+     * @returns {Promise}
+     */
+    _navigateToUrl: function(url) {
+      Promise
+        .try(function() {
+          cm.event.trigger('navigate:start', {url: url});
+        })
+        .then(function() {
+          return this._handleLocationChange(url)
+        }.bind(this))
+        .then(function() {
+          cm.event.trigger('navigate:end', {url: url});
+        });
     },
 
     /**

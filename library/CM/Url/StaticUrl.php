@@ -3,38 +3,27 @@
 namespace CM\Url;
 
 use CM_Frontend_Environment;
-use League\Uri\Components\HierarchicalPath;
-use League\Uri\Components\Query;
 
 class StaticUrl extends AssetUrl {
 
     public function getUriRelativeComponents() {
-        $path = $this->path->prepend(
-            HierarchicalPath::createFromSegments(['static'], HierarchicalPath::IS_ABSOLUTE)
-        );
-        /** @var Query $query */
-        $query = $this->query;
+        $query = $this->_getQueryComponent();
         if ($deployVersion = $this->getDeployVersion()) {
-            $pairs = $query->getPairs();
-            $pairs[(string) $deployVersion] = null;
-            $query = Query::createFromPairs($pairs);
+            $query .= (!empty($query) ? '&' : '?') . $this->getDeployVersion();
         }
-        return ''
-            . $path->getUriComponent()
-            . $query->getUriComponent()
-            . $this->fragment->getUriComponent();
+        $segments = array_merge(['static'], $this->_getPathSegments());
+        return $this->_getPathFromSegments($segments) . $query . $this->_getFragmentComponent();
     }
 
     /**
      * @param string                       $url
      * @param CM_Frontend_Environment|null $environment
-     * @param array|null                   $environmentOptions
      * @param string|null                  $deployVersion
      * @return StaticUrl
      */
-    public static function create($url, CM_Frontend_Environment $environment = null, array $environmentOptions = null, $deployVersion = null) {
+    public static function create($url, CM_Frontend_Environment $environment = null, $deployVersion = null) {
         /** @var StaticUrl $staticUrl */
-        $staticUrl = parent::_create($url, $environment, $environmentOptions, $deployVersion);
+        $staticUrl = parent::_create($url, $environment, $deployVersion);
         return $staticUrl;
     }
 }

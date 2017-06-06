@@ -45,7 +45,7 @@
           <div>{$exception.class}: {$exception.message|escape} in {$exception.file} on line {$exception.line}</div>
           {if (!empty($exception.trace))}
             {foreach from=$exception.trace item=traceRow name=traceLoop}
-              <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code} at {$traceRow.file} line {$traceRow.line}</div>
+              <div>{$smarty.foreach.traceLoop.index}. {$traceRow.code|escape} at {$traceRow.file} line {$traceRow.line}</div>
             {/foreach}
           {elseif (!empty($exception.traceString))}
             <div>{$exception.traceString}</div>

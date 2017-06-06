@@ -30,9 +30,8 @@ class CM_Paging_Translation_Language_Search extends CM_Paging_Translation_Langua
 
         $orderBy = 'k.name ASC';
         $join = 'LEFT JOIN `cm_languageValue` AS v ON k.id = v.languageKeyId AND v.languageId = ' . $this->_language->getId() . ' ';
-        $groupBy = 'BINARY k.name';
         $source = new CM_PagingSource_Sql_Deferred('k.name AS `key`, v.value, k.variables',
-            'cm_model_languagekey` as `k', implode(' AND ', $where), $orderBy, $join, $groupBy, $parameters);
+            'cm_model_languagekey` as `k', implode(' AND ', $where), $orderBy, $join, null, $parameters);
         parent::__construct($source);
     }
 }

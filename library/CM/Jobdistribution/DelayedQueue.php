@@ -15,25 +15,34 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $params
      * @param int                             $delay
      */
-    public function addJob(CM_Jobdistribution_Job_Abstract $job, array $params, $delay) {
+    public function addJob(CM_Jobdistribution_Job_Abstract $job, $delay) {
         CM_Db_Db::insert('cm_jobdistribution_delayedqueue', [
-            'className' => get_class($job),
-            'params'    => CM_Params::encode($params, true),
+            'className' => $job->getJobName(),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
             'executeAt' => time() + (int) $delay,
         ]);
     }
 
     /**
      * @param CM_Jobdistribution_Job_Abstract $job
-     * @param array                           $params
      */
-    public function cancelJob(CM_Jobdistribution_Job_Abstract $job, array $params) {
+    public function cancelJob(CM_Jobdistribution_Job_Abstract $job) {
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', [
-            'className' => get_class($job),
-            'params'    => CM_Params::encode($params, true),
+            'className' => $job->getJobName(),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
+        ]);
+    }
+
+    /**
+     * @param CM_Jobdistribution_Job_Abstract $job
+     * @return int
+     */
+    public function countJob(CM_Jobdistribution_Job_Abstract $job) {
+        return CM_Db_Db::count('cm_jobdistribution_delayedqueue', [
+            'className' => $job->getJobName(),
+            'params'    => CM_Util::jsonEncode($job->getParams()->getParamsEncoded()),
         ]);
     }
 
@@ -41,9 +50,10 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
         $executeAtMax = time();
         $result = CM_Db_Db::select('cm_jobdistribution_delayedqueue', '*', '`executeAt` <= ' . $executeAtMax, '`executeAt` ASC');
         while ($row = $result->fetch()) {
-            $job = $this->_instantiateJob($row['className']);
+            $jobName = $row['className'];
+            $job = $this->_instantiateJob($jobName, $row['params']);
             if ($job) {
-                $job->queue(CM_Params::decode($row['params'], true));
+                $this->getServiceManager()->getJobQueue()->queue($job);
             }
         }
         CM_Db_Db::delete('cm_jobdistribution_delayedqueue', '`executeAt` <= ' . $executeAtMax);
@@ -51,12 +61,24 @@ class CM_Jobdistribution_DelayedQueue implements CM_Service_ManagerAwareInterfac
 
     /**
      * @param string $className
+     * @param string $paramsEncoded
      * @return CM_Jobdistribution_Job_Abstract|null
      */
-    protected function _instantiateJob($className) {
+    protected function _instantiateJob($className, $paramsEncoded) {
+        $params = null;
+        try {
+            $params = CM_Params::decode($paramsEncoded, true);
+        } catch (Exception $ex) {
+            $context = new CM_Log_Context();
+            $context->setException($ex);
+            $context->setExtra(['job' => $className, 'paramsEncoded' => $paramsEncoded]);
+            $this->getServiceManager()->getLogger()->warning('Job-params could not be decoded', $context);
+            return null;
+        }
         try {
             /** @var CM_Jobdistribution_Job_Abstract $job */
-            $job = new $className();
+            $jobParams = CM_Params::factory($params, false);
+            $job = new $className($jobParams);
             if ($job instanceof CM_Service_ManagerAwareInterface) {
                 /** @var CM_Service_ManagerAwareInterface $job */
                 $job->setServiceManager($this->getServiceManager());

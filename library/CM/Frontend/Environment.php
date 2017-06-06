@@ -69,7 +69,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     public function getSite() {
         $site = $this->_site;
         if (null === $site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         return $site;
     }
@@ -207,7 +207,7 @@ class CM_Frontend_Environment extends CM_Class_Abstract {
     }
 
     /**
-     * @return CM_Http_ClientDevice
+     * @return CM_Http_ClientDevice|null
      */
     public function getClientDevice() {
         return $this->_clientDevice;

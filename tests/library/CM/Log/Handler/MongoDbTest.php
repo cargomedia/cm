@@ -65,15 +65,15 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $this->assertSame($level, $savedRecord['level']);
         $this->assertSame($message, $savedRecord['message']);
 
-        /** @var MongoDate $createdAt */
+        /** @var MongoDB\BSON\UTCDateTime $createdAt */
         $createdAt = $savedRecord['createdAt'];
-        /** @var MongoDate $expireAt */
+        /** @var MongoDB\BSON\UTCDateTime $expireAt */
         $expireAt = $savedRecord['expireAt'];
 
-        $this->assertInstanceOf('MongoDate', $createdAt);
-        $this->assertInstanceOf('MongoDate', $expireAt);
+        $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $createdAt);
+        $this->assertInstanceOf('MongoDB\BSON\UTCDateTime', $expireAt);
 
-        $this->assertSame($ttl, $expireAt->sec - $createdAt->sec);
+        $this->assertSame($ttl, $expireAt->toDateTime()->getTimestamp() - $createdAt->toDateTime()->getTimestamp());
 
         $context = $savedRecord['context'];
         $this->assertSame(['id' => $user->getId(), 'name' => $user->getDisplayName()], $context['user']);

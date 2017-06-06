@@ -62,7 +62,7 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
             $site = $this->_recipient->getSite();
         }
         if (!$site) {
-            $site = CM_Site_Abstract::factory();
+            $site = (new CM_Site_SiteFactory())->getDefaultSite();
         }
         $this->_site = $site;
 
@@ -81,13 +81,13 @@ class CM_Mail_Mailable extends CM_View_Abstract implements CM_Typed {
         $message->setSubject($subject);
         $message->setBodyWithAlternative($text, $html);
 
-        $job = new CM_Mail_SendJob();
         $params = ['message' => $message];
         if ($recipient) {
             $params['recipient'] = $recipient;
             $params['mailType'] = $this->getType();
         }
-        $job->queue($params);
+        $job = new CM_Mail_SendJob(CM_Params::factory($params, false));
+        CM_Service_Manager::getInstance()->getJobQueue()->queue($job);
     }
 
     /**

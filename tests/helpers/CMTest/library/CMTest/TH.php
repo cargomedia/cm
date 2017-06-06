@@ -24,11 +24,20 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
-        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
+        self::clearConfig();
+        self::clearServices();
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
+    }
+
+    public static function clearCache() {
+        CM_Cache_Shared::getInstance()->flush();
+        CM_Cache_Local::getInstance()->flush();
+    }
+
+    public static function clearConfig() {
         CM_Config::set(unserialize(self::$_configBackup));
     }
 
@@ -37,9 +46,8 @@ class CMTest_TH {
         $script->unload(new CM_OutputStream_Null());
     }
 
-    public static function clearCache() {
-        CM_Cache_Shared::getInstance()->flush();
-        CM_Cache_Local::getInstance()->flush();
+    public static function clearServices() {
+        CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
     }
 
     public static function timeInit() {
@@ -229,7 +237,7 @@ class CMTest_TH {
      * @throws CM_Class_Exception_TypeNotConfiguredException
      */
     public static function createResponsePage($uri, CM_Model_User $viewer = null) {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $headers = array('host' => $site->getHost());
         $request = new CM_Http_Request_Get($uri, $headers, null, $viewer);
         return CM_Http_Response_Page::createFromRequest($request, $site, self::getServiceManager());

@@ -88,15 +88,16 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
      */
     private function _getOptions() {
         $serviceManager = CM_Service_Manager::getInstance();
+        $site = $this->getRender()->getSite();
 
         $options = array();
         $options['name'] = CM_App::getInstance()->getName();
         $options['deployVersion'] = CM_App::getInstance()->getDeployVersion();
         $options['renderStamp'] = floor(microtime(true) * 1000);
-        $options['site'] = CM_Params::encode($this->getRender()->getSite());
-        $options['url'] = $this->getRender()->getSite()->getUrl();
-        $options['urlBase'] = $this->getRender()->getSite()->getUrlBase();
-        $options['urlCdn'] = $this->getRender()->getSite()->getUrlCdn();
+        $options['site'] = CM_Params::encode($site);
+        $options['url'] = $site->getUrl()->getUriBaseComponents();
+        $options['urlBase'] = $site->getUrl()->withoutPrefix()->getUriBaseComponents();
+        $options['urlCdn'] = $site->getUrlCdn()->getUriBaseComponents();
         $options['urlUserContentList'] = $serviceManager->getUserContent()->getUrlList();
         $options['urlServiceWorker'] = $this->getRender()->getUrlServiceWorker();
         $options['language'] = $this->getRender()->getLanguage();

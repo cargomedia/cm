@@ -257,7 +257,14 @@ var CM_View_Abstract = Backbone.View.extend({
       this.disable();
     }
 
-    var promise = cm.ajax('ajax', {viewInfoList: options.view.getViewInfoList(), method: functionName, params: params})
+    var promise = this
+      .try(function() {
+        return cm.ajax('ajax', {
+          viewInfoList: options.view.getViewInfoList(),
+          method: functionName,
+          params: params
+        });
+      })
       .then(function(response) {
         if (response.exec) {
           new Function(response.exec).call(handler);
@@ -278,8 +285,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {String} functionName
-   * @param {Object|Null} [params]
-   * @param {Object|Null} [options]
+   * @param {Object} [params]
+   * @param {Object} [options]
    * @return Promise
    */
   ajaxModal: function(functionName, params, options) {
@@ -291,8 +298,8 @@ var CM_View_Abstract = Backbone.View.extend({
 
   /**
    * @param {String} className
-   * @param {Object|Null} [params]
-   * @param {Object|Null} [options]
+   * @param {Object} [params]
+   * @param {Object} [options]
    * @return Promise
    */
   loadComponent: function(className, params, options) {
@@ -302,10 +309,12 @@ var CM_View_Abstract = Backbone.View.extend({
     });
     params = params || {};
     params.className = className;
-    var self = this;
-    return this.ajax(options.method, params, options)
+    return this
+      .try(function() {
+        return this.ajax(options.method, params, options);
+      })
       .then(function(response) {
-        return self._injectView(response);
+        return this._injectView(response);
       });
   },
 
@@ -651,6 +660,20 @@ var CM_View_Abstract = Backbone.View.extend({
     new Function(response.js).call(this);
     var view = cm.views[response.autoId];
     this.registerChild(view);
+    return view;
+  },
+
+  /**
+   * @param {Object} response
+   * @return CM_Abstract_View
+   */
+  _replaceView: function(response) {
+    cm.window.appendHidden(response.html);
+    new Function(response.js).call(this);
+    var view = cm.views[response.autoId];
+    this.getParent().registerChild(view);
+    this.replaceWithHtml(view.$el);
+    view._ready();
     return view;
   }
 });

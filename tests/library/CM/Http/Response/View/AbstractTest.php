@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
     public function tearDown() {
@@ -43,7 +45,6 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             'name' => 'My site',
         ]);
         $page = new CM_Page_View_Ajax_Test_Mock();
-        $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
             'path'          => $page::getPath(),
             'currentLayout' => 'CM_Layout_Default',
@@ -110,7 +111,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testProcessReturnDeployVersion() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -151,7 +152,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site2->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageRedirectDifferentSitePathRemove() {
@@ -171,7 +173,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site2->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site2->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageRedirectDifferentSitePathAdd() {
@@ -191,7 +194,8 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf('CM_Http_Response_View_Abstract', $response);
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site1->getUrl() . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['redirectExternal']);
+        $url = Url::create(CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site1->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['redirectExternal']);
     }
 
     public function testLoadPageNotRedirectLanguage() {
@@ -211,11 +215,12 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
 
         $this->assertViewResponseSuccess($response);
         $responseDecoded = CM_Params::jsonDecode($response->getContent());
-        $this->assertSame($site->getUrl() . '/en' . CM_Page_View_Ajax_Test_Mock::getPath(), $responseDecoded['success']['data']['url']);
+        $url = Url::create('/en' . CM_Page_View_Ajax_Test_Mock::getPath())->withBaseUrl($site->getUrl());
+        $this->assertSame((string) $url, $responseDecoded['success']['data']['url']);
     }
 
     public function testLoadPageTracking() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -233,7 +238,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
     }
 
     public function testLoadPageTrackingRedirect() {
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_MockRedirectSelf();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -257,7 +262,7 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
             'errorPage' => 'CM_Page_View_Ajax_Test_Mock',
         ];
 
-        $site = CM_Site_Abstract::factory();
+        $site = (new CM_Site_SiteFactory())->getDefaultSite();
         $page = new CM_Page_View_Ajax_Test_Mock();
         $env = new CM_Frontend_Environment($site, CMTest_TH::createUser());
         $params = [
@@ -282,21 +287,18 @@ class CM_Http_Response_View_AbstractTest extends CMTest_TestCase {
         $component = new CM_Component_Notfound([]);
         $viewResponse = new CM_Frontend_ViewResponse($component);
         $request = $this->createRequestAjax($component, 'reloadComponent', ['foo' => 'bar'], $viewResponse);
+        /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
         $this->assertViewResponseSuccess($response);
 
-        $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $viewResponse->getAutoId();
-        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
+        $jsonResponse = CM_Util::jsonDecode($response->getContent());
 
-        $expected = <<<EOL
-cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Notfound({el:$("#$newAutoId").get(0),params:{"foo":"bar"}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
-cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
-cm.views["$newAutoId"]._ready();
-EOL;
-        $this->assertSame($expected, $frontend->getJs());
+        // no better way to get the autoId because Response::_getComponentRendering() creates a new Render instance
+        $autoId = $jsonResponse['success']['data']['autoId'];
+        $js = sprintf('cm.views["%s"] = new CM_Component_Notfound({el:$("#%s").get(0),params:{"foo":"bar"}});', $autoId, $autoId);
+        $html = sprintf("<div id=\"%s\" class=\"CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\">Sorry, this page was not found. It has been removed or never existed.\n</div>", $autoId);
+        $this->assertSame($js, $jsonResponse['success']['data']['js']);
+        $this->assertSame($html, $jsonResponse['success']['data']['html']);
     }
 
     public function testReloadComponentAdditionalParams() {
@@ -306,24 +308,21 @@ EOL;
         $config->CM_Model_Entity_Mock2 = new stdClass();
         $config->CM_Model_Entity_Mock2->type = CM_Model_Entity_Mock2::getTypeStatic();
 
-        $component = new CM_Component_Mock();
+        $component = new CM_Component_Mock(['entity' => $entity, 'foo' => 'bar', 'foz' => 'baz']);
         $viewResponse = new CM_Frontend_ViewResponse($component);
-        $request = $this->createRequestAjax($component, 'reloadComponent', ['entity' => $entity], $viewResponse);
+        $request = $this->createRequestAjax($component, 'reloadComponent', ['foz' => 'toto'], $viewResponse);
+        /** @var CM_Http_Response_View_Abstract $response */
         $response = $this->processRequest($request);
-
         $this->assertViewResponseSuccess($response);
-        $frontend = $response->getRender()->getGlobalResponse();
-        $oldAutoId = $viewResponse->getAutoId();
-        $newAutoId = $frontend->getTreeRoot()->getValue()->getAutoId();
 
-        $expected = <<<EOL
-cm.window.appendHidden("<div id=\\"$newAutoId\\" class=\\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\\">Sorry, this page was not found. It has been removed or never existed.\\n<\/div>");
-cm.views["$newAutoId"] = new CM_Component_Mock({el:$("#$newAutoId").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null}}});
-cm.views["$oldAutoId"].getParent().registerChild(cm.views["$newAutoId"]);
-cm.views["$oldAutoId"].replaceWithHtml(cm.views["$newAutoId"].\$el);
-cm.views["$newAutoId"]._ready();
-EOL;
-        $this->assertSame($expected, $frontend->getJs());
+        $jsonResponse = CM_Util::jsonDecode($response->getContent());
+
+        // no better way to get the autoId because Response::_getComponentRendering() creates a new Render instance
+        $autoId = $jsonResponse['success']['data']['autoId'];
+        $js = sprintf('cm.views["%s"] = new CM_Component_Mock({el:$("#%s").get(0),params:{"entity":{"_class":"CM_Model_Entity_Mock2","_type":123,"_id":{"id":"1"},"id":1,"path":null},"foo":"bar","foz":"toto"}});', $autoId, $autoId);
+        $html = sprintf("<div id=\"%s\" class=\"CM_Component_Mock CM_Component_Notfound CM_Component_Abstract CM_View_Abstract\">Sorry, this page was not found. It has been removed or never existed.\n</div>", $autoId);
+        $this->assertSame($js, $jsonResponse['success']['data']['js']);
+        $this->assertSame($html, $jsonResponse['success']['data']['html']);
     }
 
     public function testLoadComponent() {

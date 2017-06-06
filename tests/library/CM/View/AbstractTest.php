@@ -3,7 +3,7 @@
 class CM_View_AbstractTest extends CMTest_TestCase {
 
     public function testConstructor() {
-        $params = new CM_Params(['foo' => 'bar', 'baz' => 'cex']);
+        $params = new CM_Params(['foo' => 'bar', 'baz' => 'cex'], false);
         /** @var CM_View_Abstract $view */
         $view = $this->getMockForAbstractClass('CM_View_Abstract', ['params' => $params]);
 
@@ -28,7 +28,7 @@ class CM_View_AbstractTest extends CMTest_TestCase {
         $mockResponse = $mockClassResponse->newInstance([$request, $site, $this->getServiceManager()]);
         $componentHandler = new CM_Frontend_JavascriptContainer_View();
 
-        $view->ajax_loadComponent(new CM_Params(['className' => 'CM_Component_Abstract']), $componentHandler, $mockResponse);
+        $view->ajax_loadComponent(new CM_Params(['className' => 'CM_Component_Abstract'], false), $componentHandler, $mockResponse);
 
         $this->assertSame(1, $mockLoadComponentMethod->getCallCount());
     }

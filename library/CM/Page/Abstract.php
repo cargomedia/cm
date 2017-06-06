@@ -47,6 +47,7 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
     public static final function getClassnameByPath(CM_Frontend_Render $render, $path) {
         $path = (string) $path;
 
+        $path = preg_replace('!/+!', '/', $path);
         $pathTokens = explode('/', $path);
         array_shift($pathTokens);
 
@@ -63,27 +64,15 @@ abstract class CM_Page_Abstract extends CM_Component_Abstract {
      * @return string
      */
     public static function getPath(array $params = null) {
-        $pageClassName = get_called_class();
-        $list = explode('_', $pageClassName);
+        return CM_Page_UrlFactory::getUrl(static::class, $params)->getUriRelativeComponents();
+    }
 
-        // Remove first parts
-        foreach ($list as $index => $entry) {
-            unset($list[$index]);
-            if ($entry == 'Page') {
-                break;
-            }
-        }
-
-        // Converts upper case letters to dashes: CodeOfHonor => code-of-honor
-        foreach ($list as $index => $entry) {
-            $list[$index] = CM_Util::uncamelize($entry);
-        }
-
-        $path = '/' . implode('/', $list);
-        if ($path == '/index') {
-            $path = '/';
-        }
-        return CM_Util::link($path, $params);
+    /**
+     * @param array|null $params
+     * @return array|null
+     */
+    public static function getUrlParts(array $params = null) {
+        return null;
     }
 
     /**
