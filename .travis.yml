@@ -1,7 +1,8 @@
 language: php
 
 php:
-  - 5.6
+  - 7.0
+  - 7.1
 
 services:
   - mysql
@@ -13,6 +14,7 @@ addons:
   apt:
     sources:
       - mongodb-upstart
+      - sourceline: 'ppa:ondrej/php'
     packages:
       - libgearman-dev
       - mongodb-org-server
@@ -20,11 +22,11 @@ addons:
 
 before_script:
   - phpenv config-rm xdebug.ini
-  - tests/travis/install-php-runkit.sh
+  - tests/travis/install-php-timecop.sh
+  - tests/travis/install-pecl-gearman.sh
   - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats-1.0.3
-  - travis_retry pecl install gearman-1.0.3
   - yes '' | travis_retry pecl install apcu-4.0.10
   - travis_retry pecl -q install mongodb-1.2.0alpha3
   - phpenv config-add tests/travis/php.ini

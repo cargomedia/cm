@@ -6,6 +6,8 @@ class CM_UtilTest extends CMTest_TestCase {
         $this->assertSame(0.0, (float) CM_Util::benchmark());
         $this->assertSame(0.0, (float) CM_Util::benchmark('CM'));
 
+        CMTest_TH::timeForward(1);
+
         $this->assertGreaterThan(0, (float) CM_Util::benchmark());
         $this->assertGreaterThan(0, (float) CM_Util::benchmark('CM'));
     }
