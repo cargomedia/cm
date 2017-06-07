@@ -94,9 +94,6 @@ class CM_Clockwork_Manager {
         $this->_checkEventExists($eventName);
         $this->_storage->fetchData();
         $status = $this->_storage->getStatus($event);
-        if ($status->isRunning()) {
-            throw new CM_Exception_Invalid('Event is already running', null, ['eventName' => $eventName]);
-        }
         $status->setRunning(true)->setLastStartTime($startTime);
         $this->_storage->setStatus($event, $status);
     }
@@ -110,9 +107,6 @@ class CM_Clockwork_Manager {
         $this->_checkEventExists($eventName);
         $this->_storage->fetchData();
         $status = $this->_storage->getStatus($event);
-        if (!$status->isRunning()) {
-            throw new CM_Exception_Invalid('Cannot stop event. Event is not running.', null, ['eventName' => $event->getName()]);
-        }
         $status->setRunning(false);
         $this->_storage->setStatus($event, $status);
     }
