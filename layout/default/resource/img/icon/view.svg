@@ -1,16 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<g id="Layer_1">
-	<g>
-		<path d="M504.7,251.3C453.6,161.7,353.6,104.9,256,104.9c-97.5,0-197.4,56.8-248.7,146.4c-1.7,3-1.7,6.7,0,9.7
-			C58.4,350.6,158.4,407.1,256,407.1c97.4,0,197.4-56.5,248.7-146.1C506.4,258,506.4,254.3,504.7,251.3z M256.8,356.9
-			C200.6,356.9,155,311.3,155,255s45.6-101.9,101.9-101.9S358.7,198.8,358.7,255S313.1,356.9,256.8,356.9z"/>
-		<circle cx="256.8" cy="255" r="39.7"/>
-	</g>
-</g>
-<g id="Layer_2">
-</g>
+<svg class="icon icon-view" height="16" viewBox="0 0 16 16" version="1.1" aria-hidden="true">
+    <path
+      d="M16,7.85A9.42,9.42,0,0,0,8,3.16,9.43,9.43,0,0,0,0,7.85a.31.31,0,0,0,0,.31,9.41,9.41,0,0,0,8,4.68,9.42,9.42,0,0,0,8-4.67A.31.31,0,0,0,16,7.85ZM8,11.23A3.26,3.26,0,1,1,11.29,8,3.26,3.26,0,0,1,8,11.23Z"/>
+    <circle cx="8.03" cy="7.97" r="1.27"/>
 </svg>

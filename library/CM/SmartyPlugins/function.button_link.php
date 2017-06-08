@@ -1,5 +1,6 @@
 <?php
 require_once 'function.linkUrl.php';
+require_once 'function.icon.php';
 
 function smarty_function_button_link(array $params, Smarty_Internal_Template $template) {
     $isHtmlLabel = isset($params['isHtmlLabel']) ? (bool) $params['isHtmlLabel'] : false;
@@ -61,10 +62,10 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
     $iconMarkup = '';
     if ($icon) {
         if ($iconConfirm) {
-            $iconMarkup = '<span class="icon icon-' . $icon . ' confirmClick-state-inactive"></span>'
-                . '<span class="icon icon-' . $iconConfirm . ' confirmClick-state-active"></span>';
+            $iconMarkup = '<span class="confirmClick-state-inactive">' . smarty_function_icon(['icon' => $icon], $template) . '</span>'
+                . '<span class="confirmClick-state-active">' . smarty_function_icon(['icon' => $iconConfirm], $template) . '</span>';
         } else {
-            $iconMarkup = '<span class="icon icon-' . $icon . '"></span>';
+            $iconMarkup = smarty_function_icon(['icon' => $icon], $template);
         }
 
         if ($iconPosition == 'right') {

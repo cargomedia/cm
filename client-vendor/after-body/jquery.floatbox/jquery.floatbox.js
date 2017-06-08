@@ -61,7 +61,10 @@
       var $floatboxBody = $('<div class="floatbox-body"/>');
       lastFocusedElement = document.activeElement;
       if (this.options.closable) {
-        $floatboxControls.append('<a class="closeFloatbox icon-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '"/>');
+        var icon = '<svg class="icon icon-close" height="16" viewBox="0 0 16 16" version="1.1" aria-hidden="true">';
+        icon += '<path d="M9.21,8l6.53-6.53A.86.86,0,0,0,14.53.25L8,6.79,1.47.25A.86.86,0,0,0,.25,1.47L6.79,8,.25,14.53a.86.86,0,1,0,1.21,1.21L8,9.21l6.53,6.53a.86.86,0,1,0,1.21-1.21Z"/>';
+        icon += '</svg>';
+        $floatboxControls.append('<a class="closeFloatbox button-close" role="button" href="javascript:;" title="' + cm.language.get("Close") + '">' + icon + '</a>');
       }
       this.$floatbox = $('<div class="floatbox" role="dialog" aria-hidden="false" tabindex="0" />');
 
@@ -85,7 +88,7 @@
       _.defer(function() {
         self.$floatbox.addClass('fadeIn');
       });
-      
+
       $floatboxContainer.add($floatboxOverlay).addClass('fadeIn').on('click.floatbox', function(e) {
         if (this === e.target) {
           self.close.apply(self);

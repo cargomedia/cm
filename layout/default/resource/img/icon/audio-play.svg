@@ -1,14 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<g id="Layer_1">
-	<g>
-		<path d="M106.6,486c-34.8,0-63.1-28.3-63.1-63.1V89.1c0-34.8,28.3-63.1,63.1-63.1c11.3,0,22.4,3,32.1,8.8L437,201.4
-			c11.6,6.4,31.5,25.1,31.5,54.6c0,29-19.7,47.9-31.3,54.5l-299,167C135.8,478.9,122.4,486,106.6,486z"/>
-	</g>
-</g>
-<g id="Layer_2">
-</g>
+<svg class="icon icon-audio-play" height="16" viewBox="0 0 15 16" version="1.1" aria-hidden="true">
+    <path
+      d="M2.3,16A2.2,2.2,0,0,1,.11,13.81V2.19A2.19,2.19,0,0,1,3.42.31L13.8,6.1A2.22,2.22,0,0,1,14.89,8,2.25,2.25,0,0,1,13.8,9.9L3.4,15.71A2.41,2.41,0,0,1,2.3,16Z"/>
 </svg>

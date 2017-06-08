@@ -61,13 +61,18 @@ class CM_Component_Example extends CM_Component_Abstract {
      * @return string[]
      */
     private function _getIcons() {
-        $file = new CM_File(DIR_PUBLIC . '/static/css/library/icon.less');
-        if (!$file->exists()) {
-            return array();
-        }
+        $site = $this->getParams()->getSite('site');
 
-        preg_match_all('#\.icon-(.+?):before { content:#', $file->read(), $icons);
-        return $icons[1];
+        $filesNames = [];
+        foreach (array_reverse($site->getModules()) as $moduleName) {
+            $path = CM_Util::getModulePath($moduleName) . 'layout/default/resource/img/icon';
+
+            if (file_exists($path)) {
+                $filesNames = array_merge($filesNames, scandir($path));
+            }
+        }
+        $filesNames = preg_grep('/^([^.].*\.svg$)/', $filesNames);
+        return str_replace('.svg', '', $filesNames);
     }
 
     /**

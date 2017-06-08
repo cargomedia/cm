@@ -1,13 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<g id="Layer_1">
-	<path d="M417.9,109l-73-78c-3-3.2-7.1-5-11.5-5H106.3C97.5,26,90,33,90,41.8v426.6c0,8.7,7.5,17.6,16.3,17.6h300.2
-		c8.7,0,15.5-8.8,15.5-17.6V119.8C422,115.8,420.6,112,417.9,109z M395.1,121h-66.6c-1.2,0-3.6-1.1-3.6-2.3v-69c0-1.9,3-2.8,4.3-1.5
-		l66.9,69.1C397.6,118.7,397,121,395.1,121z"/>
-</g>
-<g id="Layer_2">
-</g>
+<svg class="icon icon-document" height="16" viewBox="0 0 12 16" version="1.1" aria-hidden="true">
+    <path
+      d="M11.63,2.89,9.09.17A.54.54,0,0,0,8.69,0H.79A.56.56,0,0,0,.23.55V15.39A.62.62,0,0,0,.79,16H11.23a.6.6,0,0,0,.54-.61V3.26A.55.55,0,0,0,11.63,2.89Zm-.79.42H8.52s-.12,0-.12-.08V.82c0-.07.11-.1.15-.05l2.33,2.4A.07.07,0,0,1,10.84,3.3Z"/>
 </svg>

@@ -1,35 +1,8 @@
-<ul class="menu-sub">
-  <li>
-    <a href="javascript:;"><span class="icon-home"></span><span class="label">Home</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-message"></span><span class="label">Mailbox</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-member-add"></span><span class="label">Friend Requests</span></a>
-  </li>
-</ul>
+{$menu = [
+['label' => 'Entry 1', 'page' => 'CM_Page_Example', 'icon' => 'home'],
+['label' => 'Entry 2', 'page' => 'CM_Page_Example', 'icon' => 'settings'],
+['label' => 'Entry 3', 'page' => 'CM_Page_Example', 'icon' => 'profile']
+]}
 
-<ul class="menu-tabs">
-  <li>
-    <a href="javascript:;"><span class="icon-home"></span><span class="label">Home</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-message"></span><span class="label">Mailbox</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-member-add"></span><span class="label">Friend Requests</span></a>
-  </li>
-</ul>
-
-<ul class="menu-pills">
-  <li>
-    <a href="javascript:;"><span class="icon-home"></span><span class="label">Home</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-message"></span><span class="label">Mailbox</span></a>
-  </li>
-  <li>
-    <a href="javascript:;"><span class="icon-member-add"></span><span class="label">Friend Requests</span></a>
-  </li>
-</ul>
+{menu class='menu-tabs' data=$menu}
+{menu class='menu-pills' data=$menu}

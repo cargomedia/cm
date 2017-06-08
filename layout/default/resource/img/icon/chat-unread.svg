@@ -1,9 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 19.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<path d="M256,26C144.3,26,53.4,116.9,53.4,228.6c0,70.6,20.5,119.4,66.3,156.5l-0.4,77.7c0,8,4.1,15.5,10.8,19.7
-	c3.8,2.4,8,3.5,12.3,3.5c3.5,0,6.9-0.8,10.2-2.4c36.1-17.7,93.3-45.5,108.5-52.6c109.3-2.7,197.5-92.5,197.5-202.5
-	C458.6,116.9,367.7,26,256,26z"/>
+<svg class="icon icon-chat-unread" height="16" viewBox="0 0 15 16" version="1.1" aria-hidden="true">
+    <path d="M7.5,0a7.05,7.05,0,0,0-7,7,6.41,6.41,0,0,0,2.31,5.44v2.7a.81.81,0,0,0,1.16.73l3.77-1.83A7,7,0,0,0,7.5,0Z"/>
 </svg>

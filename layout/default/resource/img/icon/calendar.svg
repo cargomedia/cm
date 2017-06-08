@@ -1,25 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 18.1.1, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 512 512" enable-background="new 0 0 512 512" xml:space="preserve">
-<g id="Layer_1">
-	<g>
-		<path d="M139.5,132c12.9,0,22.5-10.5,22.5-23.4V26h-45v82.6C117,121.5,126.6,132,139.5,132z"/>
-		<rect x="117" y="255" width="47" height="47"/>
-		<rect x="194" y="255" width="46" height="47"/>
-		<rect x="272" y="255" width="45" height="47"/>
-		<rect x="348" y="255" width="46" height="47"/>
-		<rect x="117" y="347" width="47" height="46"/>
-		<rect x="194" y="347" width="46" height="46"/>
-		<rect x="272" y="347" width="45" height="46"/>
-		<rect x="348" y="347" width="46" height="46"/>
-		<path d="M411,56v52.6c0,21.4-18.6,38.8-40,38.8s-40-17.4-40-38.8V55H178v53.6c0,21.4-15.6,38.8-37,38.8s-37-17.4-37-38.8V56.1
-			c-33,3.3-63,31.7-63,66.6v296c0,37.2,29.8,67.3,66.9,67.3h296c37.2,0,67.1-30.1,67.1-67.3v-296C471,87.5,446,59,411,56z
-			 M424,418.3c0,11.7-7.7,21.7-19.4,21.7H108.3C96.6,440,87,430,87,418.3V209h337V418.3z"/>
-		<path d="M372,132c12.9,0,23-10.5,23-23.4V26h-46v82.6C349,121.5,359.1,132,372,132z"/>
-	</g>
-</g>
-<g id="Layer_2">
-</g>
+<svg class="icon icon-calendar" height="16" viewBox="0 0 15 16" version="1.1" aria-hidden="true">
+    <path d="M3.45,3.69a.79.79,0,0,0,.78-.81V0H2.67V2.87A.79.79,0,0,0,3.45,3.69Z"/>
+    <rect x="2.67" y="7.97" width="1.63" height="1.63"/>
+    <rect x="5.34" y="7.97" width="1.6" height="1.63"/>
+    <rect x="8.06" y="7.97" width="1.57" height="1.63"/>
+    <rect x="10.7" y="7.97" width="1.6" height="1.63"/>
+    <rect x="2.67" y="11.17" width="1.63" height="1.6"/>
+    <rect x="5.34" y="11.17" width="1.6" height="1.6"/>
+    <rect x="8.06" y="11.17" width="1.57" height="1.6"/>
+    <rect x="10.7" y="11.17" width="1.6" height="1.6"/>
+    <path
+      d="M12.89,1V2.87a1.39,1.39,0,0,1-2.78,0V1H4.79V2.87a1.29,1.29,0,1,1-2.57,0V1A2.43,2.43,0,0,0,0,3.36v10.3A2.33,2.33,0,0,0,2.35,16h10.3A2.33,2.33,0,0,0,15,13.66V3.36A2.27,2.27,0,0,0,12.89,1Zm.45,12.6a.7.7,0,0,1-.67.75H2.36a.76.76,0,0,1-.74-.75V6.37H13.34Z"/>
+    <path d="M11.53,3.69a.8.8,0,0,0,.8-.81V0h-1.6V2.87A.8.8,0,0,0,11.53,3.69Z"/>
 </svg>
