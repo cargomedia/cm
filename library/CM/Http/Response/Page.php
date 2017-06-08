@@ -1,6 +1,6 @@
 <?php
 
-use CM\Url\Url;
+use CM\Url\AppUrl;
 
 class CM_Http_Response_Page extends CM_Http_Response_Abstract {
 
@@ -109,8 +109,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
      */
     private function _processPage(CM_Http_Request_Abstract $request, CM_Http_Response_Page_ProcessingResult $result) {
         return $this->_runWithCatching(function () use ($request, $result) {
-            $url = Url::createWithParams($request->getPath(), $request->getQuery());
-            $result->addPath($url->getUriRelativeComponents());
+            $result->addPath($request->getUrl()->getUriRelativeComponents());
 
             $this->getSite()->rewrite($request);
             $pageParams = CM_Params::factory($request->getQuery(), true);
@@ -129,7 +128,7 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $environment = $this->getRender()->getEnvironment();
             $page->prepareResponse($environment, $this);
             if ($this->getRedirectUrl()) {
-                $request->setUri($this->getRedirectUrl());
+                $request->setUrlFromString($this->getRedirectUrl());
                 return true;
             }
             if ($page->getCanTrackPageView()) {
@@ -141,15 +140,13 @@ class CM_Http_Response_Page extends CM_Http_Response_Abstract {
             $this->getRender()->getGlobalResponse()->clear();
             /** @var CM_Page_Abstract $errorPage */
             $errorPage = $errorOptions['errorPage'];
-            $request->setPath($errorPage::getPath());
-            $request->setQuery(array());
+            $request->rewriteUrl(CM_Page_UrlFactory::getUrl($errorPage));
             return false;
         });
     }
 
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
         $request = clone $request;
-        $request->popPathLanguage();
         return new self($request, $site, $serviceManager);
     }
 

@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\Url;
+
 class CM_Site_SiteFactoryTest extends CMTest_TestCase {
 
     public function tearDown() {
@@ -24,18 +26,19 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
         $this->assertEquals($sorted, $property->getValue($siteFactory));
     }
 
-    public function testFindSite() {
+    public function testFindGetSiteByUrl() {
         $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com']);
         $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/hello']);
-        $site3 = $this->getMockSite(null, null, ['url' => 'http://your-site.com']);
+        $site3 = $this->getMockSite(null, null, ['url' => 'http://your-site.com', 'urlCdn' => 'http://cdn.your-site.com']);
 
         $siteList = [$site1, $site2, $site3];
         $siteFactory = new CM_Site_SiteFactory($siteList);
 
-        $this->assertEquals($site3, $siteFactory->findSite(new CM_Http_Request_Get('/foo', ['host' => 'your-site.com'])));
-        $this->assertEquals($site1, $siteFactory->findSite(new CM_Http_Request_Get('/foo', ['host' => 'my-site.com'])));
-        $this->assertEquals($site2, $siteFactory->findSite(new CM_Http_Request_Get('/hello/foo', ['host' => 'my-site.com'])));
-        $this->assertNull($siteFactory->findSite(new CM_Http_Request_Get('/foo', ['host' => 'another-site.com'])));
+        $this->assertEquals($site1, $siteFactory->findSiteByUrl(new Url('http://my-site.com')));
+        $this->assertEquals($site2, $siteFactory->findSiteByUrl(new Url('https://my-site.com/hello')));
+        $this->assertEquals($site3, $siteFactory->findSiteByUrl(new Url('http://your-site.com/foo/bar?query')));
+        $this->assertEquals($site3, $siteFactory->findSiteByUrl(new Url('http://cdn.your-site.com')));
+        $this->assertNull($siteFactory->findSiteByUrl(new Url('http://their-site.com')));
     }
 
     public function testFindGetSiteById() {

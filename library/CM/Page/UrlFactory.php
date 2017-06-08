@@ -1,6 +1,6 @@
 <?php
 
-use CM\Url\Url;
+use CM\Url\PageUrl;
 
 class CM_Page_UrlFactory {
 
@@ -8,11 +8,11 @@ class CM_Page_UrlFactory {
      * @param string                       $pageClassName
      * @param array|null                   $params
      * @param CM_Frontend_Environment|null $environment
-     * @return Url
+     * @return PageUrl
      */
     public static function getUrl($pageClassName, array $params = null, CM_Frontend_Environment $environment = null) {
         self::assertPage($pageClassName);
-        $url = Url::createFromParts(self::_getParts($pageClassName, $params));
+        $url = PageUrl::createFromParts(self::_getParts($pageClassName, $params));
         if ($environment) {
             self::assertSupportedSite($pageClassName, $environment->getSite());
             $url = $url->withEnvironment($environment);
@@ -33,7 +33,7 @@ class CM_Page_UrlFactory {
                 'path' => self::_getPathDefault($pageClassName),
             ];
             if (null !== $params && count($params) > 0) {
-                $url = Url::createWithParams('', $params);
+                $url = PageUrl::createWithParams('', $params);
                 $pageParts['query'] = $url->getQuery();
             }
         }

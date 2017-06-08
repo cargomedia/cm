@@ -4,7 +4,7 @@ namespace CM\Url;
 
 use CM_Exception_Invalid;
 
-class BaseUrl extends AbstractUrl {
+class BaseUrl extends Url {
 
     public function __construct($uri = '') {
         parent::__construct($uri);
@@ -16,11 +16,15 @@ class BaseUrl extends AbstractUrl {
     }
 
     public function getUriRelativeComponents() {
+        return $this->_getPathFromSegments();
+    }
+
+    public function getSegments() {
         $segments = [];
         if ($prefix = $this->getPrefix()) {
-            $segments = array_merge([$prefix], $segments);
+            $segments[] = $prefix;
         }
-        return $this->_getPathFromSegments($segments);
+        return $segments;
     }
 
     /**
@@ -29,7 +33,7 @@ class BaseUrl extends AbstractUrl {
      * @throws CM_Exception_Invalid
      */
     public static function create($url) {
-        $baseUrl = parent::_create($url);
+        $baseUrl = new static($url);
         /** @var BaseUrl $baseUrl */
         $baseUrl = $baseUrl
             ->withPrefix($baseUrl->getPath())

@@ -23,7 +23,8 @@ function smarty_function_resourceUrl(array $params, Smarty_Internal_Template $te
     }
 
     if ($sameOrigin) {
-        $url = Url::create($url)->withBaseUrl($site->getUrl());
+        $url = new Url($url);
+        $url = $url->withBaseUrl($site->getUrl());
     }
     return (string) $url;
 }

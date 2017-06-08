@@ -78,7 +78,7 @@ class CM_Log_Handler_MongoDbTest extends CMTest_TestCase {
         $context = $savedRecord['context'];
         $this->assertSame(['id' => $user->getId(), 'name' => $user->getDisplayName()], $context['user']);
         $this->assertSame('POST', $context['httpRequest']['method']);
-        $this->assertSame('/foo?bar=1&baz=quux', $context['httpRequest']['uri']);
+        $this->assertSame('http://www.default.dev/foo?bar=1&baz=quux', $context['httpRequest']['uri']);
         $this->assertSame(['bar' => '2', 'baz' => 'quux', 'quux' => 'baz'], $context['httpRequest']['query']);
         $this->assertSame(['bar' => 'baz'], $context['httpRequest']['headers']);
         $this->assertSame(['foo' => 'quux'], $context['httpRequest']['server']);

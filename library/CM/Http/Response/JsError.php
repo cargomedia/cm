@@ -22,10 +22,8 @@ class CM_Http_Response_JsError extends CM_Http_Response_Abstract {
     }
 
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
-        if ($request->getPathPart(0) === 'jserror') {
+        if ($request->getUrl()->matchPath('jserror')) {
             $request = clone $request;
-            $request->popPathPart(0);
-            $request->popPathLanguage();
             return new self($request, $site, $serviceManager);
         }
         return null;

@@ -123,9 +123,12 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
-            'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-        $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
-        $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+            'http://cdn.default.dev/site-' . $siteType . '/version-' . $deployVersion .
+            '/layout/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+        $this->assertSame('http://cdn.default.dev/site-' . $siteType . '/version-' . $deployVersion .
+            '/layout/0', $render->getUrlResource('layout', '0'));
+        $this->assertSame('http://cdn.default.dev/site-' . $siteType . '/version-' . $deployVersion .
+            '/0/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
     }
 
     public function testGetUrlResourceDifferentSite() {
@@ -133,7 +136,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
+        $this->assertSame('http://cdn.other.com/site-' . $siteType . '/version-' . $deployVersion . '/layout/foo/bar.jpg',
             $render->getUrlResource('layout', 'foo/bar.jpg', $site));
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-use CM\Url\ResourceUrl;
+use CM\Url\AppUrl;
 
 class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
 
@@ -58,8 +58,11 @@ class CM_Usertext_Filter_EmoticonTest extends CMTest_TestCase {
             throw new CM_Exception_Invalid('Cannot find emoticon for code `' . $emoticonCode . '`.');
         }
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $url = ResourceUrl::create('img/emoticon/' . $emoticon->getFileName(), 'layout', null, $deployVersion)
-            ->withSite($this->_mockSite);
+        $url = new AppUrl('layout/img/emoticon/' . $emoticon->getFileName());
+        $url->setDeployVersion($deployVersion);
+        $url = $url
+            ->withSite($this->_mockSite)
+            ->withBaseUrl($this->_mockSite->getUrlCdn());
         $heightAttribute = $height ? ' height="' . $height . '"' : '';
         return '<img src="' . $url . '" class="emoticon emoticon-' . $emoticon->getName() . '" title="' . $emoticon->getDefaultCode() . '"' .
             $heightAttribute . ' />';

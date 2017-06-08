@@ -34,7 +34,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
 
         $this->assertSame('www.example.com', $formattedContext['computerInfo']['fqdn']);
         $this->assertSame('v7.0.1', $formattedContext['computerInfo']['phpVersion']);
-        $this->assertSame('/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedContext['httpRequest']['uri']);
+        $this->assertSame('http://www.default.dev/foo?bar=1&baz=quux&viewInfoList=fooBar', $formattedContext['httpRequest']['uri']);
         $this->assertSame(join("\n", ['{',
             '    "bar": "1",',
             '    "baz": "quux",',

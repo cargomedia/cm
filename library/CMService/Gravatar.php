@@ -38,8 +38,6 @@ class CMService_Gravatar extends CM_Class_Abstract {
         if (null !== $default) {
             $query['d'] = $default;
         }
-        return (string) Url::create('https://secure.gravatar.com')
-            ->withPath((string) $path)
-            ->withParams((array) $query);
+        return (string) Url::createWithParams('https://secure.gravatar.com', $query)->withPath((string) $path);
     }
 }

@@ -186,12 +186,12 @@ var CM_App = CM_Class_Abstract.extend({
     var url = cm.options.urlCdn;
     if (type && path) {
       var urlParts = [];
-      urlParts.push(type);
       if (cm.options.language) {
-        urlParts.push(cm.options.language.abbreviation);
+        urlParts.push('language-' + cm.options.language.abbreviation);
       }
-      urlParts.push(cm.getSiteId());
-      urlParts.push(cm.options.deployVersion);
+      urlParts.push('site-' + cm.getSiteId());
+      urlParts.push('version-' + cm.options.deployVersion);
+      urlParts.push(type);
       urlParts = urlParts.concat(path.split('/'));
 
       url += '/' + urlParts.join('/');
@@ -227,10 +227,13 @@ var CM_App = CM_Class_Abstract.extend({
    * @return {String}
    */
   getUrlAjax: function(type) {
-    var path = '/' + type;
+    var urlParts = [];
     if (cm.options.language) {
-      path += '/' + cm.options.language.abbreviation;
+      urlParts.push('language-' + cm.options.language.abbreviation);
     }
+    urlParts.push('site-' + cm.getSiteId());
+    urlParts.push(type);
+    var path = '/' + urlParts.join('/');
     return this.getUrl(path);
   },
 

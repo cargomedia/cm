@@ -1,5 +1,7 @@
 <?php
 
+use CM\Url\ServiceWorkerUrl;
+
 class CM_Http_Response_Resource_Javascript_ServiceWorker extends CM_Http_Response_Resource_Javascript_Abstract {
 
     const PATH_PREFIX_FILENAME = 'serviceworker';
@@ -11,12 +13,8 @@ class CM_Http_Response_Resource_Javascript_ServiceWorker extends CM_Http_Respons
     }
 
     public static function createFromRequest(CM_Http_Request_Abstract $request, CM_Site_Abstract $site, CM_Service_Manager $serviceManager) {
-        if ($request->hasPathPrefix('/' . self::PATH_PREFIX_FILENAME . '-')) {
+        if ($request->getUrl() instanceof ServiceWorkerUrl) {
             $request = clone $request;
-            $request->setPath(str_replace('-', '/', $request->getPath()));
-            $request->popPathPart(0);
-            $request->popPathLanguage();
-            $request->popPathPart(0);
             return new self($request, $site, $serviceManager);
         }
         return null;

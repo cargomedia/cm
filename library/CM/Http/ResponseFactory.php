@@ -34,10 +34,9 @@ class CM_Http_ResponseFactory implements CM_Service_ManagerAwareInterface {
      */
     public function findResponse(CM_Http_Request_Abstract $request) {
         $request = clone $request;
-        $site = $request->popPathSiteByMatch();
         /** @var $responseClass CM_Http_Response_Abstract */
         foreach ($this->_responseClassList as $responseClass) {
-            if ($response = $responseClass::createFromRequest($request, $site, $this->getServiceManager())) {
+            if ($response = $responseClass::createFromRequest($request, $request->getSite(), $this->getServiceManager())) {
                 return $response;
             }
         }
