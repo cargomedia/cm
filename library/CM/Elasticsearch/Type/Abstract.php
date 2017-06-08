@@ -24,7 +24,7 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
 
     /**
      * @param CM_Elasticsearch_Client $client
-     * @param int|null             $version
+     * @param int|null                $version
      * @throws CM_Exception_Invalid
      */
     public function __construct(CM_Elasticsearch_Client $client, $version = null) {
@@ -135,6 +135,9 @@ abstract class CM_Elasticsearch_Type_Abstract extends CM_Class_Abstract implemen
         try {
             $ids = $redis->sFlush($key);
             $ids = array_filter(array_unique($ids));
+            if (empty($ids)) {
+                $ids = null;
+            }
             $this->updateDocuments($ids);
             $this->refreshIndex();
         } catch (Exception $e) {
