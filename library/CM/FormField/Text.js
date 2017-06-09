@@ -49,11 +49,5 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
       this._valueLast = valueCurrent;
       this.trigger('change', {previous: valueLast, new: valueCurrent});
     }
-  },
-
-  /**
-   * @deprecated No need to call this function anymore. Text field always triggers "change".
-   */
-  enableTriggerChangeOnInput: function() {
   }
 });
