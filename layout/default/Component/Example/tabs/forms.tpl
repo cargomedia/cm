@@ -26,6 +26,8 @@
 {formField name='set' label="Set"}
 {formField name='boolean' text="Bool"}
 {formField name='booleanSwitch' text="Bool Switch" display='switch'}
+{formField name='booleanButton' text="Bool Button" display='button'}
+{formField name='booleanButton2' text="Bool Button Highlight" display='button' buttonTheme='highlight' buttonIcon='trophy'}
 {formField name='setSelect1' label="Set Select" display='radios'}
 {formField name='setSelect2' label="Set Select" placeholder=true}
 {formField name='setSelect3' label="Set Select with Prefix" labelPrefix="FooBar" placeholder=true}
