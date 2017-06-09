@@ -102,7 +102,7 @@ class CM_Site_SiteFactory {
         $type = (int) $type;
         $site = $this->findSiteByType($type);
         if (null === $site) {
-            throw new CM_Exception_Invalid('Site is not found', null, ['siteType' => $type]);
+            throw new CM_Exception_Invalid('Site is not found', null, ['type' => $type]);
         }
         return $site;
     }

@@ -92,10 +92,24 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $name
+     */
+    public function setName($name) {
+        $this->_set('name', $name);
+    }
+
+    /**
      * @return string
      */
     public function getEmailAddress() {
         return $this->_get('emailAddress');
+    }
+
+    /**
+     * @param string $emailAddress
+     */
+    public function setEmailAddress($emailAddress) {
+        $this->_set('emailAddress', $emailAddress);
     }
 
     /**
@@ -111,21 +125,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $emailAddress
-     */
-    public function setEmailAddress($emailAddress) {
-        $this->_set('emailAddress', $emailAddress);
-    }
-
-    /**
-     * @param string $name
-     */
-    public function setName($name) {
-        $this->_set('name', $name);
-    }
-
-    /**
-     * @param boolean $isDefault
+     * @param bool $isDefault
      */
     public function setDefault($isDefault) {
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
@@ -278,9 +278,13 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     /**
      * @param CM_Comparable $other
-     * @return boolean
+     * @return bool
+     * @throws CM_Exception_Invalid
      */
     public function equals(CM_Comparable $other = null) {
+        if (!($other instanceof CM_Site_Abstract)) {
+            throw new CM_Exception_Invalid('Not a `CM_Site_Abstract` instance');
+        }
         if (null === $other) {
             return false;
         }
@@ -323,7 +327,6 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         return [new CM_Paging_Site_All()];
     }
 
-    //TODO type or ID
     public static function fromArray(array $array) {
         $id = (string) $array['id'];
         return (new CM_Site_SiteFactory())->getSiteById($id);
@@ -361,7 +364,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         $site->_set([
             'name'         => (string) $name,
             'emailAddress' => (string) $emailAddress,
-            'siteType'     => $type,
+            '_type'        => $type,
         ]);
         $site->commit();
         return $site;
