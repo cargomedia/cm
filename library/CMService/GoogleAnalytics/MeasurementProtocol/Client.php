@@ -8,11 +8,19 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
     /** @var string */
     protected $_propertyId;
 
+    /** @var CM_Jobdistribution_QueueInterface */
+    private $_jobQueue;
+
     /**
-     * @param string $propertyId
+     * @param string                                 $propertyId
+     * @param CM_Jobdistribution_QueueInterface|null $jobQueue
      */
-    public function __construct($propertyId) {
+    public function __construct($propertyId, CM_Jobdistribution_QueueInterface $jobQueue = null) {
         $this->_propertyId = (string) $propertyId;
+        if (null === $jobQueue) {
+            $jobQueue = CM_Service_Manager::getInstance()->getJobQueue();
+        }
+        $this->_jobQueue = $jobQueue;
     }
 
     /**
@@ -68,8 +76,8 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
      * @param array $parameterList
      */
     protected function _queueHit(array $parameterList) {
-        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob();
-        $job->queue($parameterList);
+        $job = new CMService_GoogleAnalytics_MeasurementProtocol_SendHitJob(CM_Params::factory($parameterList, false));
+        $this->_jobQueue->queue($job);
     }
 
     /**
@@ -129,7 +137,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
                 'hitTypeList' => ['event'],
                 'validator'   => function ($value) {
                     return ctype_digit((string) $value);
-                }
+                },
             ],
             'exd' => [
                 'aliasList'   => ['exDescription'],
@@ -140,7 +148,7 @@ class CMService_GoogleAnalytics_MeasurementProtocol_Client {
                 'hitTypeList' => ['exception'],
                 'validator'   => function ($value) {
                     return in_array($value, [0, 1], true);
-                }
+                },
             ],
         ];
     }

@@ -1,9 +1,8 @@
 <?php
 
-class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
+class CM_Gearman_WorkerTest extends CMTest_TestCase {
 
     public function testRun() {
-        CM_Config::get()->CM_Jobdistribution_JobWorker->servers = [];
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
@@ -17,13 +16,10 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
             }
             throw new Exception('foo-bar');
         }));
-        $mockBuilder = $this->getMockBuilder('CM_Jobdistribution_JobWorker')->setConstructorArgs([1000]);
-        $mockBuilder->setMethods(['_getGearmanWorker', '_handleException']);
-        $jobWorkerMock = $mockBuilder->getMock();
-        $jobWorkerMock->expects($this->any())->method('_getGearmanWorker')->will($this->returnValue($gearmanWorkerMock));
-        /** @var CM_JobDistribution_JobWorker $jobWorkerMock */
+        $jobWorker = new CM_Gearman_Worker($gearmanWorkerMock, (new CM_Gearman_Factory())->createSerializer(), 1000);
+        /** @var CM_Gearman_Worker $jobWorker */
         $serviceManager = new CM_Service_Manager();
-        $jobWorkerMock->setServiceManager($serviceManager);
+        $jobWorker->setServiceManager($serviceManager);
         /** @var CM_Log_Logger|\Mocka\AbstractClassTrait $logger */
         $logger = $this->mockObject('CM_Log_Logger');
         $serviceManager->registerInstance('logger', $logger);
@@ -35,7 +31,7 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
             $this->assertEquals('foo-bar', $exception->getMessage());
         });
         try {
-            $jobWorkerMock->run();
+            $jobWorker->run();
         } catch (CM_Exception_Invalid $ex) {
             $this->assertContains('Worker failed', $ex->getMessage());
             $this->assertSame(2, $counter);
@@ -46,22 +42,19 @@ class CM_JobDistribution_JobWorkerTest extends CMTest_TestCase {
     }
 
     public function testRunJobLimit() {
-        $serviceManager = new CM_Service_Manager();
-        $logger = $this->mockObject('CM_Log_Logger');
-        $serviceManager->registerInstance('logger', $logger);
-        
         if (!extension_loaded('gearman')) {
             $this->markTestSkipped('Gearman Pecl Extension not installed.');
         }
+        $serviceManager = new CM_Service_Manager();
+        $logger = $this->mockObject('CM_Log_Logger');
+        $serviceManager->registerInstance('logger', $logger);
+
         $gearmanWorker = $this->mockClass('GearmanWorker')->newInstanceWithoutConstructor();
         $workMethod = $gearmanWorker->mockMethod('work')->set(true);
 
-        CM_Config::get()->CM_Jobdistribution_JobWorker->servers = [];
-        $worker = $this->mockClass(CM_Jobdistribution_JobWorker::class)->newInstance([5]);
-        $worker->mockMethod('_getGearmanWorker')->set($gearmanWorker);
-        /** @var CM_Jobdistribution_JobWorker $worker */
-        $worker->setServiceManager($serviceManager);
-        $worker->run();
+        $jobWorker = new CM_Gearman_Worker($gearmanWorker, (new CM_Gearman_Factory())->createSerializer(), 5);
+        $jobWorker->setServiceManager($serviceManager);
+        $jobWorker->run();
         $this->assertSame(5, $workMethod->getCallCount());
     }
 }

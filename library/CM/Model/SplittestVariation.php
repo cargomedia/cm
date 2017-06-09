@@ -18,6 +18,7 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
 
     /**
      * @param bool $state
+     * @return $this
      * @throws CM_Exception
      */
     public function setEnabled($state) {
@@ -31,6 +32,29 @@ class CM_Model_SplittestVariation extends CM_Model_Abstract {
         CM_Db_Db::update('cm_splittestVariation', array('enabled' => $state), array('id' => $this->getId()));
         $this->_change();
         $variationsEnabled->_change();
+        return $this;
+    }
+
+    /**
+     * @return float
+     */
+    public function getFrequency() {
+        return (float) $this->_get('frequency');
+    }
+
+    /**
+     * @param float $frequency
+     * @return $this
+     * @throws CM_Exception_Invalid
+     */
+    public function setFrequency($frequency) {
+        $frequency = (float) $frequency;
+        $frequency = round($frequency, 2);
+        if ($frequency <= 0) {
+            throw new CM_Exception_Invalid('Frequency must be positive');
+        }
+        CM_Db_Db::update('cm_splittestVariation', ['frequency' => $frequency], ['id' => $this->getId()]);
+        return $this->_change();
     }
 
     /**

@@ -24,7 +24,7 @@ class CM_Model_StreamChannel_Message_User extends CM_Model_StreamChannel_Message
             $user = $streamSubscribe->getUser();
             if ($user && !$this->isSubscriber($user, $streamSubscribe)) {
                 $delayedJobQueue = CM_Service_Manager::getInstance()->getDelayedJobQueue();
-                $delayedJobQueue->addJob(new CM_User_OfflineJob(), ['user' => $user], CM_Model_User::OFFLINE_DELAY);
+                $delayedJobQueue->addJob(new CM_User_OfflineJob(CM_Params::factory(['user' => $user], false)), CM_Model_User::OFFLINE_DELAY);
             }
         }
     }

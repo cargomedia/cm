@@ -36,6 +36,7 @@ EOF;
     }
 
     public function trackPageView(CM_Frontend_Environment $environment, $path) {
+        $this->_setDataLayerVariable('event', 'Page View');
         if ($environment->hasViewer()) {
             $fixture = new CM_Splittest_Fixture($environment->getViewer());
         } elseif (($clientDevice = $environment->getClientDevice()) && $clientDevice->hasId()) {
@@ -46,6 +47,10 @@ EOF;
             foreach ($variationDataList as $variationData) {
                 $this->_setDataLayerVariable('Splittest ' . $variationData['splittest'], $variationData['variation']);
             }
+        }
+        if ($viewer = $environment->getViewer()) {
+            $this->_setDataLayerVariable('username', $viewer->getDisplayName());
+            $this->_setDataLayerVariable('accountAge', time() - $viewer->getCreated());
         }
     }
 
@@ -59,7 +64,6 @@ EOF;
      */
     protected function _setDataLayerVariable($name, $value) {
         $name = (string) $name;
-        $value = (string) $value;
         $this->_dataLayer[$name] = $value;
         return $this;
     }

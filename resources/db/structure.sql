@@ -179,11 +179,13 @@ DROP TABLE IF EXISTS `cm_model_languagekey`;
 CREATE TABLE `cm_model_languagekey` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
   `name` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
-  `variables` text CHARACTER SET utf8 COLLATE utf8_bin,
+  `variables` text CHARACTER SET utf8 COLLATE utf8_bin NOT NULL,
   `updateCountResetVersion` int(10) unsigned DEFAULT NULL,
   `updateCount` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `javascript` tinyint(3) unsigned NOT NULL,
+  `nameHash` varchar(40) NOT NULL,
   PRIMARY KEY (`id`),
+  UNIQUE KEY `nameHash` (`nameHash`),
   KEY `javascript` (`javascript`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
@@ -343,6 +345,7 @@ CREATE TABLE `cm_splittestVariation` (
   `splittestId` int(10) unsigned NOT NULL,
   `name` varchar(100) NOT NULL,
   `enabled` tinyint(1) NOT NULL DEFAULT '1',
+  `frequency` decimal(10,2) NOT NULL DEFAULT '1.00',
   PRIMARY KEY (`id`),
   UNIQUE KEY `splittestId_name` (`splittestId`,`name`),
   KEY `splittestId` (`splittestId`),

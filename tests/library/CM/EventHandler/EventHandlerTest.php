@@ -8,14 +8,14 @@ class CM_EventHandler_EventHandlerTest extends CMTest_TestCase {
     public function testBindJob() {
         $eventHandler = new CM_EventHandler_EventHandler();
         self::$_foo = '';
-        $eventHandler->bindJob('foo', new CM_JobMock_1(), array('text' => 'bar'));
+        $eventHandler->bindJob('foo', CM_JobMock_1::class, array('text' => 'bar'));
         $eventHandler->trigger('foo');
         $this->assertEquals('bar', self::$_foo);
 
         self::$_counter = 0;
-        $eventHandler->bindJob('foo', new CM_JobMock_2());
-        $eventHandler->bindJob('foo', new CM_JobMock_3(), array('i' => 2));
-        $eventHandler->bindJob('foo', new CM_JobMock_4(), array('a' => 4));
+        $eventHandler->bindJob('foo', CM_JobMock_2::class);
+        $eventHandler->bindJob('foo', CM_JobMock_3::class, array('i' => 2));
+        $eventHandler->bindJob('foo', CM_JobMock_4::class, array('a' => 4));
         $eventHandler->trigger('foo', array('i' => 8));
         $this->assertEquals('barbar', self::$_foo);
         $this->assertEquals(13, self::$_counter);

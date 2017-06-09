@@ -31,20 +31,31 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
             return preg_match('/^' . strtolower($namespace) . '_/', $collection);
         });
         sort($collectionList);
-        $optionsValid = ['unique', 'name', 'dropDups', 'sparse', 'expireAfterSeconds'];
         $indexes = [];
         foreach ($collectionList as $collection) {
-            $indexList = $mongo->getIndexInfo($collection);
-            foreach ($indexList as $indexInfo) {
-                $key = $indexInfo['key'];
-                $options = array_intersect_key($indexInfo, array_flip($optionsValid));
+            $indexInfoList = $mongo->getIndexInfo($collection);
+            /** @var \MongoDB\Model\IndexInfo $indexInfo */
+            foreach ($indexInfoList as $indexInfo) {
+                $key = $indexInfo->getKey();
+                $options = [];
+                if ($indexInfo->isUnique()) {
+                    $options['unique'] = true;
+                }
+                $options['name'] = $indexInfo->getName();
+                if ($indexInfo->isSparse()) {
+                    $options['sparse'] = true;
+                }
+                if ($indexInfo->isTtl()) {
+                    $expireAfterSeconds = $indexInfo->__debugInfo()['expireAfterSeconds'];
+                    $options['expireAfterSeconds'] = $expireAfterSeconds;
+                }
                 $indexes[$collection][] = ['key' => $key, 'options' => $options];
             }
         }
         $dump = CM_Params::jsonEncode($indexes, true);
         $dirPath = CM_Util::getModulePath($namespace) . '/resources/mongo/';
         CM_File::getFilesystemDefault()->ensureDirectory($dirPath);
-        CM_File::create($dirPath . 'collections.json', $dump);
+        CM_File::create($dirPath . 'collections.json', $dump . PHP_EOL);
     }
 
     /**

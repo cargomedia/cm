@@ -24,12 +24,12 @@ class CMTest_TH {
     }
 
     public static function clearEnv() {
+        self::clearConfig();
         self::clearServices();
         self::clearDb();
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
-        self::clearConfig();
     }
 
     public static function clearCache() {

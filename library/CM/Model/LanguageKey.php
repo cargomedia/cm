@@ -12,10 +12,14 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     /**
-     * @return string $name
+     * @param string $name
      */
     public function setName($name) {
-        $this->_set('name', $name);
+        $hash = self::calculateHash($name);
+        $this->_set([
+            'nameHash' => $hash,
+            'name'     => $name,
+        ]);
         $this->_changeContainingCacheables();
     }
 
@@ -23,9 +27,6 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @return string[]
      */
     public function getVariables() {
-        if (!$this->_has('variables')) {
-            return array();
-        }
         $variablesEncoded = $this->_get('variables');
         return CM_Params::jsonDecode($variablesEncoded);
     }
@@ -95,17 +96,18 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     protected function _getSchema() {
-        return new CM_Model_Schema_Definition(array(
-            'name'                    => array('type' => 'string'),
-            'variables'               => array('type' => 'string', 'optional' => true),
-            'updateCountResetVersion' => array('type' => 'int', 'optional' => true),
-            'updateCount'             => array('type' => 'int'),
-            'javascript'              => array('type' => 'bool'),
-        ));
+        return new CM_Model_Schema_Definition([
+            'name'                    => ['type' => 'string'],
+            'variables'               => ['type' => 'string'],
+            'updateCountResetVersion' => ['type' => 'int', 'optional' => true],
+            'updateCount'             => ['type' => 'int'],
+            'javascript'              => ['type' => 'bool'],
+            'nameHash'                => ['type' => 'string'],
+        ]);
     }
 
     protected function _onDeleteBefore() {
-        CM_Db_Db::delete('cm_languageValue', array('languageKeyId' => $this->getId()));
+        CM_Db_Db::delete('cm_languageValue', ['languageKeyId' => $this->getId()]);
     }
 
     protected function _getContainingCacheables() {
@@ -124,19 +126,28 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      * @param string     $name
      * @param array|null $variables
      * @return CM_Model_LanguageKey
+     * @throws CM_Db_Exception
      */
     public static function create($name, array $variables = null) {
         $languageKey = new self();
+        $variables = (array) $variables;
         $languageKey->_set([
             'name'                    => $name,
             'updateCount'             => 0,
             'updateCountResetVersion' => 0,
             'javascript'              => false,
+            'variables'               => CM_Util::jsonEncode($variables),
+            'nameHash'                => self::calculateHash($name),
         ]);
-        $languageKey->setVariables($variables);
-        $languageKey->commit();
+        try {
+            $languageKey->commit();
+        } catch (CM_Db_Exception $e) {
+            $languageKey = self::findByName($name);
+            if (null === $languageKey) {
+                throw $e;
+            }
+        }
 
-        $languageKey = self::_replaceWithExisting($languageKey);
         return $languageKey;
     }
 
@@ -146,7 +157,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function findByName($name) {
         $name = (string) $name;
-        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchColumn();
+        $languageKeyId = CM_Db_Db::select('cm_model_languagekey', 'id', ['name' => $name])->fetchColumn();
         if (!$languageKeyId) {
             return null;
         }
@@ -174,7 +185,7 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
      */
     public static function exists($name) {
         $name = (string) $name;
-        return (boolean) CM_Db_Db::count('cm_model_languagekey', array('name' => $name));
+        return (boolean) CM_Db_Db::count('cm_model_languagekey', ['name' => $name]);
     }
 
     /**
@@ -205,18 +216,10 @@ class CM_Model_LanguageKey extends CM_Model_Abstract {
     }
 
     /**
-     * @param CM_Model_LanguageKey $languageKey
-     * @return CM_Model_LanguageKey
+     * @param string $name
+     * @return string
      */
-    protected static function _replaceWithExisting(CM_Model_LanguageKey $languageKey) {
-        $name = $languageKey->getName();
-        $languageKeyIdList = CM_Db_Db::select('cm_model_languagekey', 'id', array('name' => $name), 'id ASC')->fetchAllColumn();
-
-        if (count($languageKeyIdList) > 1) {
-            $languageKeyId = array_shift($languageKeyIdList);
-            CM_Db_Db::exec("DELETE FROM `cm_model_languagekey` WHERE `name` = ? AND `id` != ?", array($name, $languageKeyId));
-            $languageKey = new self($languageKeyId);
-        }
-        return $languageKey;
+    public static function calculateHash($name) {
+        return hash('sha1', (string) $name);
     }
 }
