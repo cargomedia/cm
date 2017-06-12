@@ -4,7 +4,7 @@ steps:
   test-services:
     title: Test CM application
     type: launch-composition
-    composition: docker-compose
+    composition: ./docker-compose.yml
     composition_candidates:
       cm:
         image: cargomedia/cm-application:latest
