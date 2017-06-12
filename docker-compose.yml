@@ -1,0 +1,75 @@
+version: '2'
+services:
+
+  cm:
+    image: cargomedia/cm-application:latest
+    command: '/docker-run-php5-fpm'
+    volumes:
+      - .:/app/cm:rw,cached
+      - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
+      - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
+      - ./docker/config/php:/usr/local/etc/php
+      - data-cm:/app/cm/data
+    depends_on:
+      - mysql
+      - mongo
+      - memcached
+      - elasticsearch
+      - redis
+      - gearman
+    environment:
+      PHP_IDE_CONFIG: serverName=docker.cm.dev
+    working_dir: '/app/cm'
+    mem_limit: 2000000000
+    memswap_limit: 3000000000
+    mem_reservation: 512m
+
+  mysql:
+    image: mysql:5.5.54
+    environment:
+      MYSQL_ROOT_PASSWORD: docker
+    volumes:
+      - data-mysql:/var/lib/mysql
+      - ./docker/config/mysql/conf.d:/etc/mysql/conf.d
+    ports:
+      - "3306:3306"
+
+  mongo:
+    image: mongo:2.6.12
+    command: "--config /mongo/config/mongod.conf"
+    volumes:
+      - data-mongo:/data/db
+      - ./docker/config/mongo:/mongo/config
+    ports:
+      - "27017:27017"
+
+  memcached:
+    image: memcached:1.4
+    command: "-p 11211 -m 2048 -u memcache -l 0.0.0.0 -c 10000 -v"
+
+  elasticsearch:
+    image: elasticsearch:1.3.9
+    volumes:
+      - data-elasticsearch:/usr/share/elasticsearch/data
+      - ./docker/config/elasticsearch:/usr/share/elasticsearch/config
+
+  redis:
+    image: redis:3.2.6
+    command: '/redis/config/redis.conf'
+    volumes:
+      - data-redis:/data
+      - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+
+  gearman:
+    image: pataquets/gearmand:latest
+    command: "--job-retries=25 -q libsqlite3 --libsqlite3-db=/gearman/data/db.sqlite3"
+    volumes:
+      - data-gearman:/gearman/data
+
+volumes:
+  data-cm:
+  data-mysql:
+  data-redis:
+  data-mongo:
+  data-gearman:
+  data-elasticsearch:
