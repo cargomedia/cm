@@ -1,6 +1,26 @@
 version: '1.0'
 steps:
 
+  build-cm:
+    dockerfile: ./docker/build/Dockerfile.cm
+    image-name: 'ci/cm-application'
+
+  build-elasticsearch:
+    dockerfile: ./docker/build/Dockerfile.elasticsearch
+    image-name: 'ci/elasticsearch'
+
+  build-mongo:
+    dockerfile: ./docker/build/Dockerfile.mongo
+    image-name: 'ci/mongo'
+
+  build-mysql:
+    dockerfile: ./docker/build/Dockerfile.mysql
+    image-name: 'ci/mysql'
+
+  build-redis:
+    dockerfile: ./docker/build/Dockerfile.redis
+    image-name: 'ci/redis'
+
   test-services:
     title: Test CM application
     type: composition
