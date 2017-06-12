@@ -2,11 +2,13 @@ version: '2'
 services:
 
   cm:
-    build: .
-    image: cargomedia/cm-ci:v1
-    command: /docker-run-php5-fpm
-      - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
-      - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
+    image: cargomedia/cm-application:latest
+    command: '/docker-run-php5-fpm'
+    volumes:
+      - .:/app/cm
+      - ${{main_clone}}/resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
+      - ${{main_clone}}/resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
+      - ${{main_clone}}/docker/config/php:/usr/local/etc/php
       - data-cm:/app/cm/data
     depends_on:
       - mysql
@@ -18,9 +20,6 @@ services:
     environment:
       PHP_IDE_CONFIG: serverName=docker.cm.dev
     working_dir: '/app/cm'
-    mem_limit: 2000000000
-    memswap_limit: 3000000000
-    mem_reservation: 512m
 
   mysql:
     image: mysql:5.5.54
@@ -28,18 +27,14 @@ services:
       MYSQL_ROOT_PASSWORD: docker
     volumes:
       - data-mysql:/var/lib/mysql
-      - ./docker/config/mysql/conf.d:/etc/mysql/conf.d
-    ports:
-      - "3306:3306"
+      - ${{main_clone}}/docker/config/mysql/conf.d:/etc/mysql/conf.d
 
   mongo:
     image: mongo:2.6.12
     command: "--config /mongo/config/mongod.conf"
     volumes:
       - data-mongo:/data/db
-      - ./docker/config/mongo:/mongo/config
-    ports:
-      - "27017:27017"
+      - ${{main_clone}}/docker/config/mongo:/mongo/config
 
   memcached:
     image: memcached:1.4
@@ -49,14 +44,14 @@ services:
     image: elasticsearch:1.3.9
     volumes:
       - data-elasticsearch:/usr/share/elasticsearch/data
-      - ./docker/config/elasticsearch:/usr/share/elasticsearch/config
+      - ${{main_clone}}/docker/config/elasticsearch:/usr/share/elasticsearch/config
 
   redis:
     image: redis:3.2.6
     command: '/redis/config/redis.conf'
     volumes:
-      - data-redis:/data/redis
-      - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+      - data-redis:/data
+      - ${{main_clone}}/docker/config/redis/redis.conf:/redis/config/redis.conf
 
   gearman:
     image: pataquets/gearmand:latest
