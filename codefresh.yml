@@ -32,12 +32,8 @@ steps:
     composition: ./docker-compose.test.yml
     composition_candidates:
       cm:
-        image: cargomedia/cm-application:latest
+        image: ${{build-cm}}
         command: '/app/cm/ci/test.sh'
         working_dir: /app/cm
         volumes:
-          - ${{main_clone}}:/app/cm:rw,cached
-          - ${{main_clone}}/resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
-          - ${{main_clone}}/resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
-          - ${{main_clone}}/docker/config/php:/usr/local/etc/php
           - data-cm:/app/cm/data
