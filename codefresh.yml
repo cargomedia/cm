@@ -1,0 +1,18 @@
+version: '1.0'
+steps:
+
+  test-services:
+    title: Test CM application
+    type: launch-composition
+    composition: docker-compose
+    composition_candidates:
+      cm:
+        image: cargomedia/cm-application:latest
+        command: '/app/cm/ci/test.sh'
+        working_dir: /app/cm
+        volumes:
+          - .:/app/cm:rw,cached
+          - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
+          - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
+          - ./docker/config/php:/usr/local/etc/php
+          - data-cm:/app/cm/data
