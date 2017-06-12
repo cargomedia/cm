@@ -5,4 +5,4 @@ COPY ./resources/config/_local.docker.php /app/cm/resources/config/local.docker.
 COPY ./docker/config/php /usr/local/etc/php
 
 WORKDIR '/app/cm'
-COMMAND ["/docker-run-php5-fpm"]
+CMD ["/docker-run-php5-fpm"]
