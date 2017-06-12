@@ -2,22 +2,27 @@ version: '1.0'
 steps:
 
   build-cm:
+    type: build
     dockerfile: ./docker/build/Dockerfile.cm
     image-name: 'ci/cm-application'
 
   build-elasticsearch:
+    type: build
     dockerfile: ./docker/build/Dockerfile.elasticsearch
     image-name: 'ci/elasticsearch'
 
   build-mongo:
+    type: build
     dockerfile: ./docker/build/Dockerfile.mongo
     image-name: 'ci/mongo'
 
   build-mysql:
+    type: build
     dockerfile: ./docker/build/Dockerfile.mysql
     image-name: 'ci/mysql'
 
   build-redis:
+    type: build
     dockerfile: ./docker/build/Dockerfile.redis
     image-name: 'ci/redis'
 
