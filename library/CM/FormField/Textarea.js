@@ -8,6 +8,7 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
   events: {
     'blur [contenteditable]': function() {
       this.trigger('blur');
+      this.triggerChange();
     },
     'focus [contenteditable]': function() {
       this.trigger('focus');
@@ -85,6 +86,12 @@ var CM_FormField_Textarea = CM_FormField_Text.extend({
 
   reset: function() {
     this.setValue('');
+  },
+
+  disableTriggerChangeOnInput: function() {
+    this.delegateEvents(
+      _(this.events).omit('input [contenteditable]')
+    );
   },
 
   /**
