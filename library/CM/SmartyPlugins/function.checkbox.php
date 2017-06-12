@@ -3,20 +3,27 @@
 require_once 'function.tag.php';
 
 function smarty_function_checkbox(array $params, Smarty_Internal_Template $template) {
-    $isSwitch = isset($params['isSwitch']) ? (bool) $params['isSwitch'] : false;
+    $display = isset($params['display']) ? (string) $params['display'] : null;
     $checked = isset($params['checked']) ? (bool) $params['checked'] : false;
     $id = isset($params['id']) ? (string) $params['id'] : null;
     $label = (string) $params['label'];
     $name = isset($params['name']) ? (string) $params['name'] : null;
     $tabindex = isset($params['tabindex']) ? (int) $params['tabindex'] : null;
     $value = isset($params['value']) ? (string) $params['value'] : null;
+    $buttonTheme = isset($params['buttonTheme']) ? (string) $params['buttonTheme'] : null;
+    $buttonIcon = isset($params['buttonIcon']) ? (string) $params['buttonIcon'] : null;
 
     $classList = [];
     if (isset($params['class'])) {
         $classList[] = (string) $params['class'];
     }
-    if ($isSwitch) {
-        $classList[] = 'checkbox-switch';
+
+    switch ($display) {
+        case CM_FormField_Boolean::DISPLAY_SWITCH:
+            $classList[] = 'checkbox-switch';
+            break;
+        case CM_FormField_Boolean::DISPLAY_BUTTON:
+            $classList[] = 'checkbox-button';
     }
 
     $data = [];
@@ -47,17 +54,27 @@ function smarty_function_checkbox(array $params, Smarty_Internal_Template $templ
     $html = smarty_function_tag($attributeList, $template);
 
     $htmlLabelContent = '';
-    if ($isSwitch) {
+    if ($display === CM_FormField_Boolean::DISPLAY_BUTTON) {
+        $htmlLabelContent .= smarty_function_button_link([
+            'label' => $label,
+            'theme' => $buttonTheme,
+            'icon'  => $buttonIcon,
+            'plain' => true,
+        ], $template);
+    } else {
+        if ($display === CM_FormField_Boolean::DISPLAY_SWITCH) {
+            $htmlLabelContent .= smarty_function_tag([
+                'el'    => 'span',
+                'class' => 'handle',
+            ], $template);
+        }
+
         $htmlLabelContent .= smarty_function_tag([
-            'el'    => 'span',
-            'class' => 'handle',
+            'el'      => 'span',
+            'content' => $label,
+            'class'   => 'label',
         ], $template);
     }
-    $htmlLabelContent .= smarty_function_tag([
-        'el'      => 'span',
-        'content' => $label,
-        'class'   => 'label',
-    ], $template);
 
     $html .= smarty_function_tag([
         'el'      => 'label',

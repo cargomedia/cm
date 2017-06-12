@@ -297,6 +297,26 @@ input[type=checkbox].checkbox-switch {
   }
 }
 
+input[type=checkbox].checkbox-button {
+  + label {
+    margin-left: 0;
+
+    &::before {
+      display: none;
+    }
+  }
+
+  &:checked + label .button {
+    border-color: transparent;
+    box-shadow: inset -2px -2px 0 0px rgba(255, 255, 255, 0.15), inset 2px 2px 2px 0px rgba(0, 0, 0, 0.2), inset 0 0 0 30px rgba(0, 0, 0, 0.1), inset 0 0 12px 4px rgba(0, 0, 0, 0.08);
+    background-clip: padding-box;
+  }
+
+  &:focus + label .button {
+    border-color: @colorInputFocus;
+  }
+}
+
 .formField, .formAction {
   padding-bottom: 5px;
   padding-top: 5px;
