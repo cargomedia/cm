@@ -2,11 +2,11 @@
 
 class CM_FormField_Site extends CM_FormField_Set_Select {
 
-    //TODO fix method
     protected function _initialize() {
         $valuesSet = array();
-        foreach (CM_Site_Abstract::getAll() as $site) {
-            $valuesSet[$site->getType()] = $site->getHost();
+        foreach ((new CM_Paging_Site_All())->getItems() as $site) {
+            /** @var CM_Site_Abstract $site */
+            $valuesSet[$site->getId()] = $site->getUrl();
         }
         $this->_params->set('values', $valuesSet);
         $this->_params->set('labelsInValues', true);
