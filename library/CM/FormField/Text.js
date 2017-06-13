@@ -51,9 +51,9 @@ var CM_FormField_Text = CM_FormField_Abstract.extend({
     }
   },
 
-  /**
-   * @deprecated No need to call this function anymore. Text field always triggers "change".
-   */
-  enableTriggerChangeOnInput: function() {
+  disableTriggerChangeOnInput: function() {
+    this.delegateEvents(
+      _(this.events).omit('input input')
+    );
   }
 });
