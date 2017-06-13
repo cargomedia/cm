@@ -1,39 +1,22 @@
 version: '1.0'
 steps:
 
-  build-cm:
-    type: build
-    dockerfile: ./docker/build/Dockerfile.cm
-    image-name: 'ci/cm-application'
-
-  build-elasticsearch:
-    type: build
-    dockerfile: ./docker/build/Dockerfile.elasticsearch
-    image-name: 'ci/elasticsearch'
-
-  build-mongo:
-    type: build
-    dockerfile: ./docker/build/Dockerfile.mongo
-    image-name: 'ci/mongo'
-
-  build-mysql:
-    type: build
-    dockerfile: ./docker/build/Dockerfile.mysql
-    image-name: 'ci/mysql'
-
-  build-redis:
-    type: build
-    dockerfile: ./docker/build/Dockerfile.redis
-    image-name: 'ci/redis'
-
   test-services:
     title: Test CM application
     type: composition
     composition: ./docker-compose.test.yml
     composition_candidates:
       cm:
-        image: ${{build-cm}}
+        image: cargomedia/cm-application:latest
         command: '/app/cm/ci/test.sh'
         working_dir: /app/cm
         volumes:
           - data-cm:/app/cm/data
+        depends_on:
+          - mysql
+          - mongo
+          - memcached
+          - elasticsearch
+          - redis
+          - gearman
+

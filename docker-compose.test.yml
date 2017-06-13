@@ -1,47 +1,33 @@
 version: '2'
-services:
+  services:
+    mysql:
+      image: cargomedia/mysql:5.5.54
+      volumes:
+        - data-mysql:/var/lib/mysql
 
-  cm:
-    image: cargomedia/cm-application:latest
-    volumes:
-      - data-cm:/app/cm/data
-    depends_on:
-      - mysql
-      - mongo
-      - memcached
-      - elasticsearch
-      - redis
-      - gearman
+    mongo:
+      image: cargomedia/mongo:2.6.12
+      volumes:
+        - data-mongo:/data/db
 
-  mysql:
-    image: ${{build-mysql}}
-    volumes:
-      - data-mysql:/var/lib/mysql
+    memcached:
+      image: cargomedia/memcached:1.4
 
-  mongo:
-    image: ${{build-mongo}}
-    volumes:
-      - data-mongo:/data/db
+    elasticsearch:
+      image: cargomedia/elasticsearch:1.3.9
+      volumes:
+        - data-elasticsearch:/usr/share/elasticsearch/data
 
-  elasticsearch:
-    image: ${{build-elasticsearch}}
-    volumes:
-      - data-elasticsearch:/usr/share/elasticsearch/data
+    redis:
+      image: cargomedia/redis:3.2.6
+      volumes:
+        - data-redis:/data/redis
 
-  redis:
-    image: ${{build-redis}}
-    volumes:
-      - data-redis:/data
+    gearman:
+      image: cargomedia/gearman:latest
+      volumes:
+        - data-gearman:/gearman/data
 
-  memcached:
-    image: memcached:1.4
-    command: "-p 11211 -m 2048 -u memcache -l 0.0.0.0 -c 10000 -v"
-
-  gearman:
-    image: pataquets/gearmand:latest
-    command: "--job-retries=25 -q libsqlite3 --libsqlite3-db=/gearman/data/db.sqlite3"
-    volumes:
-      - data-gearman:/gearman/data
 
 volumes:
   data-cm:
