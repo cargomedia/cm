@@ -88,6 +88,12 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         $href = smarty_function_linkUrl($params, $template);
     }
 
+    $plain = false;
+    if (isset($params['plain'])) {
+        $plain = (bool) $params['plain'];
+        unset($params['plain']);
+    }
+
     $html = '';
 
     if ($href) {
@@ -96,6 +102,8 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
         if ($target) {
             $html .= ' target="' . CM_Util::htmlspecialchars($target) . '"';
         }
+    } elseif ($plain) {
+        $html .= '<span';
     } else {
         $html .= '<button type="button"';
     }
@@ -114,6 +122,8 @@ function smarty_function_button_link(array $params, Smarty_Internal_Template $te
 
     if ($href) {
         $html .= '</a>';
+    } elseif ($plain) {
+        $html .= '</span>';
     } else {
         $html .= '</button>';
     }

@@ -10,10 +10,6 @@ var CM_Form_Example = CM_Form_Abstract.extend({
     this.getFields().forEach(function(field) {
       field.on('ready', function() {
         field.on('change', form.logData.bind(form));
-
-        if (field instanceof CM_FormField_Text) {
-          field.enableTriggerChangeOnInput();
-        }
       });
     });
 
