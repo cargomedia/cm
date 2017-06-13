@@ -83,7 +83,7 @@ class CM_Site_SiteFactory {
      *
      * @param int $type
      * @return CM_Site_Abstract|null
-     * @deprecated use binding by id, type generally can be not unique
+     * @deprecated use binding by id, in the future site `type` will be not unique
      */
     public function findSiteByType($type) {
         $type = (int) $type;
@@ -96,7 +96,7 @@ class CM_Site_SiteFactory {
      * @param int $type
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
-     * @deprecated use binding by id, type generally can be not unique
+     * @deprecated use binding by id, in the future site `type` will be not unique
      */
     public function getSiteByType($type) {
         $type = (int) $type;

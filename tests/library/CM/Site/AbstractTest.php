@@ -82,6 +82,9 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
         $this->assertSame(false, $siteFoo1->equals($siteBar1));
         $this->assertSame(false, $siteBar1->equals($siteFoo1));
+
+        $comparableMock = $this->mockInterface(CM_Comparable::class);
+        $this->assertSame(false, $siteFoo1->equals($comparableMock->newInstanceWithoutConstructor()));
     }
 
     public function testEqualsDifferentUrl() {
@@ -115,8 +118,6 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $site->setDefault(true);
         $this->assertSame(true, $site->getDefault());
 
-        $site2 = $this->getMockSite();
-        $site2->setDefault(true);
         $site2 = $this->getMockSite();
         $site2->setDefault(true);
         $this->assertSame(false, $site->getDefault());
