@@ -13,4 +13,4 @@ steps:
     composition_candidates:
       test:
         image: ${{build_cm_full}}
-        command: './bin/test.sh'
+        command: './ci/test.sh'
