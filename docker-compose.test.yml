@@ -1,5 +1,22 @@
 version: '2'
   services:
+
+    test:
+      container_name: app_cm
+      build: ./docker/build/cm-test
+      image: cargomedia/cm-application-test:latest
+      command: './ci/all.sh'
+      working_dir: /app/cm
+      volumes:
+        - data-cm:/app/cm/data
+      depends_on:
+        - mysql
+        - mongo
+        - memcached
+        - elasticsearch
+        - redis
+        - gearman
+
     mysql:
       image: cargomedia/mysql:5.5.54
       volumes:

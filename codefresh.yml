@@ -5,8 +5,3 @@ steps:
     title: Test CM application
     type: composition
     composition: ./docker-compose.test.yml
-    composition_candidates:
-      cm:
-        build: ./docker/build/cm-test
-        image: cargomedia/cm-application-test:latest
-        command: './ci/all.sh'
