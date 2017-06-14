@@ -18,5 +18,3 @@ COPY layout ./layout
 COPY client-vendor ./client-vendor
 COPY tests ./tests
 COPY library ./library
-
-CMD ["./ci/all.sh"]

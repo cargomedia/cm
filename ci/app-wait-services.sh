@@ -40,13 +40,13 @@ count=0
 until ( test_mysql && test_redis && test_memcached && test_mongo && test_gearman && test_elasticsearch )
 do
   ((count++))
-  if [ ${count} -gt 120 ]
+  if [ ${count} -gt 60 ]
   then
     echo "Services didn't become ready in time"
     exit 1
   fi
-  sleep 0.5
-  printf "\r"
+  sleep 1
+  printf "\n"
 done
 printf "\n"
 echo "All services are ready!"

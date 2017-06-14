@@ -1,7 +1,16 @@
 version: '1.0'
 steps:
 
+  build-cm-app:
+    type: build
+    title: Build CM application with sources
+    image_name: cargomedia/cm-full:latest
+
   test-services:
     title: Test CM application
     type: composition
-    composition: ./docker-compose.test.yml
+    composition: ./docker-compose.yml
+    composition_candidates:
+      test:
+        image: ${{build-cm-app}}
+        command: './bin/test.sh'
