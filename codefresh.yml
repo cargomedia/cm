@@ -4,7 +4,7 @@ steps:
   build_cm_full:
     type: build
     title: Build CM application with sources
-    image_name: cargomedia/cm-full:latest
+    image_name: cargomedia/cm-full
 
   test_services:
     title: Test CM application
