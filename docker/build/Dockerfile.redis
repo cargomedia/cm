@@ -1,3 +1,0 @@
-FROM redis:3.2.6
-COPY ./docker/config/redis/redis.conf /redis/config/redis.conf
-CMD ["/redis/config/redis.conf"]

@@ -1,3 +1,0 @@
-FROM mongo:2.6.12
-COPY ./docker/config/mongo /mongo/config
-CMD ["--config /mongo/config/mongod.conf"]

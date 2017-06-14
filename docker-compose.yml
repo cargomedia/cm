@@ -2,7 +2,9 @@ version: '2'
 services:
 
   cm:
-    image: cargomedia/cm-application:latest
+    container_name: app_cm
+    build: ./docker/build/cm-test
+    image: cargomedia/cm-application-test:latest
     command: /docker-run-php5-fpm
     volumes:
       - .:/app/cm

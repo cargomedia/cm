@@ -1,7 +1,0 @@
-FROM cargomedia/cm-application:latest
-COPY . /app/cm
-COPY ./resources/config/_test.docker.php /app/cm/resources/config/test.docker.php
-COPY ./resources/config/_local.docker.php /app/cm/resources/config/local.docker.php
-
-WORKDIR '/app/cm'
-CMD ["/docker-run-php5-fpm"]

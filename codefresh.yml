@@ -7,16 +7,6 @@ steps:
     composition: ./docker-compose.test.yml
     composition_candidates:
       cm:
-        image: cargomedia/cm-application:latest
-        command: '/app/cm/ci/test.sh'
-        working_dir: /app/cm
-        volumes:
-          - data-cm:/app/cm/data
-        depends_on:
-          - mysql
-          - mongo
-          - memcached
-          - elasticsearch
-          - redis
-          - gearman
-
+        build: ./docker/build/cm-test
+        image: cargomedia/cm-application-test:latest
+        command: './ci/all.sh'
