@@ -9,6 +9,7 @@ steps:
   test_services:
     title: Test CM application
     type: composition
+    fail_fast: false
     composition: ./docker-compose.yml
     composition_candidates:
       test:
