@@ -2,9 +2,10 @@ version: '2'
 services:
 
   cm:
-    build: .
-    image: cargomedia/cm-ci:v1
+    image: cargomedia/cm-application:latest
     command: /docker-run-php5-fpm
+    volumes:
+      - .:/app/cm
       - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
       - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
       - data-cm:/app/cm/data
@@ -57,4 +58,3 @@ volumes:
   data-mongo:
   data-gearman:
   data-elasticsearch:
-  config-elasticsearch:

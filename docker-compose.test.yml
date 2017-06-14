@@ -28,7 +28,6 @@ version: '2'
       volumes:
         - data-gearman:/gearman/data
 
-
 volumes:
   data-cm:
   data-mysql:
