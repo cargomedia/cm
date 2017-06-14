@@ -1,15 +1,13 @@
 version: '2'
-services:
 
-  cm:
-    container_name: app_cm
-    build: ./docker/build/cm-test
+services:
+  test:
+    container_name: cm-app
+    build: .
     image: cargomedia/cm-application-test:latest
-    command: /docker-run-php5-fpm
+    command: './ci/all.sh'
+    working_dir: /app/cm
     volumes:
-      - .:/app/cm
-      - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
-      - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
       - data-cm:/app/cm/data
     depends_on:
       - mysql
@@ -18,12 +16,6 @@ services:
       - elasticsearch
       - redis
       - gearman
-    environment:
-      PHP_IDE_CONFIG: serverName=docker.cm.dev
-    working_dir: '/app/cm'
-    mem_limit: 2000000000
-    memswap_limit: 3000000000
-    mem_reservation: 512m
 
   mysql:
     image: cargomedia/mysql:5.5.54
