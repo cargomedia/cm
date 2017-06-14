@@ -2,8 +2,6 @@ version: '2'
 services:
 
   test:
-    container_name: app_cm
-    build: ./docker/build/cm-test
     image: cargomedia/cm-application-test:latest
     command: './ci/all.sh'
     working_dir: /app/cm
