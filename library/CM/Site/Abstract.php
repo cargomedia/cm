@@ -116,7 +116,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
      * @return bool
      */
     public function getDefault() {
-        //TODO invent method to avoid cache
+        //TODO try to get rid of direct mongoDb usage. problem is setDefault resets only current object's cache while modifies all collection
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
         return null !== $mongo->findOne(self::getTableName(), [
             '_id'     => CM_MongoDb_Client::getObjectId($this->getId()),
@@ -355,8 +355,17 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
             'name'         => (string) $name,
             'emailAddress' => (string) $emailAddress,
             '_type'        => $type,
+            'default'      => false,
         ]);
         $site->commit();
         return $site;
+    }
+
+    /**
+     * @return CM_Site_Abstract[]
+     * @deprecated use CM_Paging_Site_All
+     */
+    public static function getAll() {
+        return (new CM_Paging_Site_All())->getItems();
     }
 }
