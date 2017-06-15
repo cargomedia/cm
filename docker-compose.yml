@@ -52,3 +52,5 @@ volumes:
   data-mongo:
   data-gearman:
   data-elasticsearch:
+  ${{CF_VOLUME}}:
+    external: true
