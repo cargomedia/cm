@@ -15,3 +15,8 @@ steps:
       test:
         image: ${{build_cm_full}}
         command: './ci/test.sh'
+        volumes:
+          - ${{CF_VOLUME}}:/app/cm
+      volumes:
+        ${{CF_VOLUME}}:
+          external: true

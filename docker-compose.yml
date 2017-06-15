@@ -2,12 +2,12 @@ version: '2'
 
 services:
   test:
-    container_name: cm-app
     build: .
     image: cargomedia/cm-application-test:latest
-    command: './ci/all.sh'
+    command: './ci/test.sh'
     working_dir: /app/cm
     volumes:
+      - .:/app/cm
       - data-cm:/app/cm/data
     depends_on:
       - mysql
