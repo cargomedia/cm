@@ -676,14 +676,14 @@ class CM_ParamsTest extends CMTest_TestCase {
         $params = new CM_Params(['site' => $siteMock, 'bar' => 'baz', 'quux' => 5], false);
         $site = $params->getSite('site');
         $this->assertInstanceOf(CM_Site_Abstract::class, $site);
-        $this->assertSame($siteMock->getId(), $site->getId());
+        $this->assertEquals($siteMock, $site);
     }
 
     public function testGetSiteOld() {
         $siteMock = $this->getMockSite();
-        $params2 = new CM_Params(['site2' => $siteMock->getType(), 'bar' => 'baz', 'quux' => 5], false);
-        $site2 = $params2->getSite('site2');
-        $this->assertInstanceOf(CM_Site_Abstract::class, $site2);
-        $this->assertSame($siteMock->getId(), $site2->getId());
+        $params = new CM_Params(['site2' => $siteMock->getType(), 'bar' => 'baz', 'quux' => 5], false);
+        $site = $params->getSite('site2');
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site);
+        $this->assertEquals($siteMock, $site);
     }
 }
