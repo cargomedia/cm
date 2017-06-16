@@ -123,4 +123,18 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertSame(false, $site->getDefault());
         $this->assertSame(true, $site2->getDefault());
     }
+
+    public function testFactoryFromType() {
+        $siteMock = $this->getMockSite();
+        $site = CM_Site_Abstract::factoryFromType($siteMock->getId(), $siteMock->getType());
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site);
+        $this->assertEquals($siteMock, $site);
+    }
+
+    public function testFactory() {
+        $siteMock = $this->getMockSite();
+        $site = $siteMock::factory();
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site);
+        $this->assertEquals($siteMock, $site);
+    }
 }
