@@ -232,10 +232,6 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         }
     }
 
-    public function toArray() {
-        return ['id' => $this->getId()];
-    }
-
     /**
      * @param CM_Http_Request_Abstract $request
      * @return bool
@@ -322,11 +318,6 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     protected function _getContainingCacheables() {
         return [new CM_Paging_Site_All()];
-    }
-
-    public static function fromArray(array $array) {
-        $id = (string) $array['id'];
-        return (new CM_Site_SiteFactory())->getSiteById($id);
     }
 
     /**
