@@ -118,12 +118,12 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlResource() {
         $render = new CM_Frontend_Render();
-        $siteId = (new CM_Site_SiteFactory())->getDefaultSite()->getId();
+        $siteType = (new CM_Site_SiteFactory())->getDefaultSite()->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame(
-            'http://cdn.default.dev/layout/' . $siteId . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
-        $this->assertSame('http://cdn.default.dev/layout/' . $siteId . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
-        $this->assertSame('http://cdn.default.dev/0/' . $siteId . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
+            'http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg', $render->getUrlResource('layout', 'foo/bar.jpg'));
+        $this->assertSame('http://cdn.default.dev/layout/' . $siteType . '/' . $deployVersion . '/0', $render->getUrlResource('layout', '0'));
+        $this->assertSame('http://cdn.default.dev/0/' . $siteType . '/' . $deployVersion . '/foo.jpg', $render->getUrlResource('0', 'foo.jpg'));
     }
 
     public function testGetUrlResourceSameOrigin() {
@@ -139,10 +139,10 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
     public function testGetUrlResourceDifferentSite() {
         $render = new CM_Frontend_Render();
         $site = $this->getMockSite('CM_Site_Abstract', ['urlCdn' => 'http://cdn.other.com']);
-        $siteId = $site->getId();
+        $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
-        $this->assertSame('http://cdn.other.com/layout/' . $siteId . '/' . $deployVersion . '/foo/bar.jpg',
-            $render->getUrlResource('layout', 'foo/bar.jpg', null, $site));
+        $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
+            $render->getUrlResource('layout', 'foo/bar.jpg', $site));
     }
 
     public function testGetUrlStatic() {

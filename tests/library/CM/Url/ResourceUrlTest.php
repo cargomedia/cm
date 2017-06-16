@@ -17,28 +17,28 @@ class ResourceUrlTest extends CMTest_TestCase {
         $this->assertSame('/resource-type/file.ext', (string) $url);
 
         $environment = $this->createEnvironment(null, null, 'de');
-        $siteId = $environment->getSite()->getId();
+        $siteType = $environment->getSite()->getType();
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment);
-        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteId . '/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/file.ext', (string) $url);
 
         $url = ResourceUrl::create('file.ext', 'resource-type', $environment, 1234);
-        $this->assertSame('http://cdn.example.com/resource-type/de/999/1234/file.ext', (string) $url);
+        $this->assertSame('http://cdn.example.com/resource-type/de/' . $siteType . '/1234/file.ext', (string) $url);
     }
 
     public function testWithSite() {
-        $siteId = '58c7cb50837959bb398b4567';
+        $siteType = 9999 ;
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|\CM_Site_Abstract $site */
         $site = $this
             ->getMockBuilder('CM_Site_Abstract')
-            ->setMethods(['getId', 'getUrl', 'getUrlCdn'])
+            ->setMethods(['getType', 'getUrl', 'getUrlCdn'])
             ->getMockForAbstractClass();
 
         $site
             ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue($siteId));
+            ->method('getType')
+            ->will($this->returnValue($siteType));
 
         $site
             ->expects($this->any())
@@ -53,6 +53,6 @@ class ResourceUrlTest extends CMTest_TestCase {
         $url = ResourceUrl::create('file.ext', 'resource-type');
 
         $urlWithSite = $url->withSite($site);
-        $this->assertSame('http://cdn.foo.com/resource-type/42/file.ext', (string) $urlWithSite);
+        $this->assertSame('http://cdn.foo.com/resource-type/' . $siteType . '/file.ext', (string) $urlWithSite);
     }
 }
