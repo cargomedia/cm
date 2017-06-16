@@ -75,6 +75,15 @@
         },
         {
             "key": {
+                "_type": 1
+            },
+            "options": {
+                "unique": true,
+                "name": "_type_1"
+            }
+        },
+        {
+            "key": {
                 "default": 1
             },
             "options": {
