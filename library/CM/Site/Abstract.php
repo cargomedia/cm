@@ -342,6 +342,14 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         return new $siteClassName($id);
     }
 
+    /**
+     * @return CM_Site_Abstract
+     */
+    public static function factory() {
+        $type = static::getTypeStatic();
+        return (new CM_Site_SiteFactory())->getSiteByType($type);
+    }
+
     public static function getPersistenceClass() {
         return 'CM_Model_StorageAdapter_MongoDb';
     }
@@ -362,7 +370,6 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
             'name'         => (string) $name,
             'emailAddress' => (string) $emailAddress,
             '_type'        => $type,
-            'default'      => false,
         ]);
         $site->commit();
         return $site;
