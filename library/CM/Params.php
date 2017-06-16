@@ -404,7 +404,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
     public function getSite($key, $default = null) {
         $param = $this->_get($key, $default);
         if (ctype_digit($param) || is_int($param)) {
-            return (new CM_Site_SiteFactory())->getSiteById($param);
+            return (new CM_Site_SiteFactory())->getSiteByType($param);
         }
         if (!($param instanceof CM_Site_Abstract)) {
             throw new CM_Exception_InvalidParam('Not a CM_Site_Abstract');
