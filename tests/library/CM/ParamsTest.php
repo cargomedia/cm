@@ -2,6 +2,10 @@
 
 class CM_ParamsTest extends CMTest_TestCase {
 
+    protected function tearDown() {
+        CMTest_TH::clearEnv();
+    }
+
     public function testConstructMissingDecodedFlag() {
         $exception = $this->catchException(function () {
             $params = new CM_Params([], null);
@@ -665,5 +669,21 @@ class CM_ParamsTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_InvalidParam', $exception);
         $this->assertSame('Invalid param type for session', $exception->getMessage());
+    }
+
+    public function testGetSite() {
+        $siteMock = $this->getMockSite();
+        $params = new CM_Params(['site' => $siteMock, 'bar' => 'baz', 'quux' => 5], false);
+        $site = $params->getSite('site');
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site);
+        $this->assertSame($siteMock->getId(), $site->getId());
+    }
+
+    public function testGetSiteOld() {
+        $siteMock = $this->getMockSite();
+        $params2 = new CM_Params(['site2' => $siteMock->getType(), 'bar' => 'baz', 'quux' => 5], false);
+        $site2 = $params2->getSite('site2');
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site2);
+        $this->assertSame($siteMock->getId(), $site2->getId());
     }
 }

@@ -328,7 +328,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     public static function factoryFromType($id, $type) {
         $id = (string) $id;
         $type = (int) $type;
-        $siteClassName = self::_getClassName($type);
+        $siteClassName = CM_Model_Abstract::_getClassName($type); //`self` will not work
         /** @type CM_Site_Abstract $siteClassName */
         return new $siteClassName($id);
     }
