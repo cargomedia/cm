@@ -327,7 +327,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @return CM_Site_Abstract
+     * @return static
      */
     public static function factory() {
         $type = static::getTypeStatic();
