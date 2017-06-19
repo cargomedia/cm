@@ -343,23 +343,6 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
-     * @param string $name
-     * @param string $emailAddress
-     * @return static
-     */
-    public static function create($name, $emailAddress) {
-        $type = static::getTypeStatic();
-        $site = new static();
-        $site->_set([
-            'name'         => (string) $name,
-            'emailAddress' => (string) $emailAddress,
-            '_type'        => $type,
-        ]);
-        $site->commit();
-        return $site;
-    }
-
-    /**
      * @return CM_Site_Abstract[]
      * @deprecated use CM_Paging_Site_All
      */
