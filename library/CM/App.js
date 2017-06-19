@@ -42,8 +42,8 @@ var CM_App = CM_Class_Abstract.extend({
   /**
    * @return {Number}
    */
-  getSiteId: function() {
-    return cm.options.site.type;
+  getSiteType: function() {
+    return cm.options.site._type;
   },
 
   /**
@@ -190,7 +190,7 @@ var CM_App = CM_Class_Abstract.extend({
       if (cm.options.language) {
         urlParts.push(cm.options.language.abbreviation);
       }
-      urlParts.push(cm.getSiteId());
+      urlParts.push(cm.getSiteType());
       urlParts.push(cm.options.deployVersion);
       urlParts = urlParts.concat(path.split('/'));
 
@@ -898,7 +898,7 @@ var CM_App = CM_Class_Abstract.extend({
      */
     _getPersistentStorage: function() {
       if (!this._data) {
-        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteId(), localStorage, cm.logger);
+        this._data = new cm.lib.PersistentStorage(cm.options.name + ':' + cm.getSiteType(), localStorage, cm.logger);
       }
       return this._data;
     }
