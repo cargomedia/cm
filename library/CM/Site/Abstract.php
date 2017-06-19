@@ -334,6 +334,21 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $id
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Nonexistent
+     */
+    public static function factoryFromId($id) {
+        $id = (string) $id;
+        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
+        $typeRes = $mongo->findOne(self::getTableName(), ['_id' => CM_MongoDb_Client::getObjectId($id)], ['_type' => 1]);
+        if (null === $typeRes) {
+            throw new CM_Exception_Nonexistent('Site doesn\'t exist', null, ['siteId' => $id]);
+        }
+        return self::factoryFromType($id, $typeRes['_type']);
+    }
+
+    /**
      * @return static
      */
     public static function factory() {

@@ -131,6 +131,19 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertEquals($siteMock, $site);
     }
 
+    public function testFactoryFromId() {
+        $siteMock = $this->getMockSite();
+        $site = CM_Site_Abstract::factoryFromId($siteMock->getId());
+        $this->assertInstanceOf(CM_Site_Abstract::class, $site);
+        $this->assertEquals($siteMock, $site);
+
+        $exception = $this->catchException(function () {
+            CM_Site_Abstract::factoryFromId('507f1f77bcf86cd799439011');
+        });
+        $this->assertInstanceOf(CM_Exception_Nonexistent::class, $exception);
+        $this->assertSame('Site doesn\'t exist', $exception->getMessage());
+    }
+
     public function testFactory() {
         $siteMock = $this->getMockSite();
         $site = $siteMock::factory();
