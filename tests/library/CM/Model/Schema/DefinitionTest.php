@@ -290,6 +290,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
     public function testDecode() {
         CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::getTypeStatic()] = 'CM_Model_Mock_Validation';
         CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::getTypeStatic()] = 'CM_Model_Mock_Validation2';
+        $mockSite = $this->getMockSite();
         $testDataList = array(
             // nothing
             array(
@@ -433,6 +434,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'schema'      => array('type' => 'CM_Model_Mock_Validation'),
                 'returnValue' => new CM_Model_Mock_Validation('mongo123mixed321id'),
             ),
+            array(
+                'value'       => $mockSite->getId(),
+                'schema'      => array('type' => 'CM_Site_Abstract'),
+                'returnValue' => $mockSite,
+            ),
         );
         foreach ($testDataList as $testData) {
             $schema = new CM_Model_Schema_Definition(array('foo' => $testData['schema']));
@@ -448,6 +454,7 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
     public function testEncode() {
         CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation::getTypeStatic()] = 'CM_Model_Mock_Validation';
         CM_Config::get()->CM_Model_Abstract->types[CM_Model_Mock_Validation2::getTypeStatic()] = 'CM_Model_Mock_Validation2';
+        $mockSite = $this->getMockSite();
         $testDataList = array(
             // nothing
             array(
@@ -580,6 +587,11 @@ class CM_Model_Schema_DefinitionTest extends CMTest_TestCase {
                 'value'       => new CM_Model_Mock_Validation2(2),
                 'schema'      => array('type' => 'CM_Model_Mock_Validation2'),
                 'returnValue' => '2',
+            ),
+            array(
+                'value'       => $mockSite,
+                'schema'      => array('type' => 'CM_Site_Abstract'),
+                'returnValue' => $mockSite->getId(),
             ),
         );
         foreach ($testDataList as $testData) {
