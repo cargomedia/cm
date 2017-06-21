@@ -50,12 +50,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     /**
      * @param string|null $className
      * @param array|null  $configuration
-     * @param array|null  $methods
      * @return Mocka\ClassMock
      * @throws CM_Exception_Invalid
      */
-    public function getMockSiteClass($className = null, array $configuration = null, array $methods = null) {
-        //TODO figure out if we use $methods.
+    public function getMockSiteClass($className = null, array $configuration = null) {
         $className = null === $className ? 'CM_Site_Abstract' : (string) $className;
         if (!is_a($className, 'CM_Site_Abstract', true)) {
             throw new CM_Exception_Invalid($className . ' is not the child of CM_Site_Abstract');
@@ -74,7 +72,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $configuration = array_merge($defaultConfiguration, (array) $configuration);
 
         $siteClassName = $className . 'Mocka' . uniqid();
-        //TODO may be change it back to one method.
         $siteClass = new Mocka\ClassMock($siteClassName, $className);
         $siteClass->mockMethod('getType')->set($type);
 
@@ -92,12 +89,10 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @param string|null $className
      * @param array|null  $configuration
      * @param array|null  $settings
-     * @param array|null  $methods
      * @return CM_Site_Abstract|\Mocka\AbstractClassTrait
      */
-    public function getMockSite($className = null, array $configuration = null, array $settings = null, array $methods = null) {
-        $siteClass = $this->getMockSiteClass($className, $configuration, $methods);
-
+    public function getMockSite($className = null, array $configuration = null, array $settings = null) {
+        $siteClass = $this->getMockSiteClass($className, $configuration);
         $defaultSettings = [
             'name'         => 'Example site',
             'emailAddress' => 'hello@example.com',
@@ -135,7 +130,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
 
         $siteArgs = [
             'classname' => null,
-            'methods'   => null,
         ];
         foreach ($siteArgs as $name => $value) {
             if (isset($siteConfig[$name])) {
@@ -143,7 +137,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
                 unset($siteConfig[$name]);
             }
         }
-        $site = $this->getMockSite($siteArgs['classname'], (array) $siteConfig, null, $siteArgs['methods']);
+        $site = $this->getMockSite($siteArgs['classname'], (array) $siteConfig);
 
         $language = null;
         if ($languageAbbreviation) {
@@ -449,7 +443,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         $html = $renderAdapter->fetch();
         return new CM_Dom_NodeList($html, true);
     }
-    
+
     /**
      * @param CM_Model_Abstract $model
      * @param string|null       $message
