@@ -77,7 +77,7 @@
         $element.trigger('revive-loaded', {hasContent: hasContent});
 
         if (hasContent) {
-          $element.addClass('advertisement-hasContent');
+          $element.addClass('Adv3rt153m3nt-hasContent');
           trackEvent('Banner', 'Impression', 'zone-' + zoneId);
           var $link = $element.find('a[href]');
           if ($element.is(':visible') && $link.length > 0) {

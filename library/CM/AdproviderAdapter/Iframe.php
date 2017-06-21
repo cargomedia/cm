@@ -12,7 +12,7 @@ class CM_AdproviderAdapter_Iframe extends CM_AdproviderAdapter_Abstract {
             'src'            => $src,
             'width'          => $width,
             'height'         => $height,
-            'class'          => 'advertisement-hasContent',
+            'class'          => 'Adv3rt153m3nt-hasContent',
             'frameborder'    => 0,
             'scrolling'      => 'no',
             'data-variables' => json_encode($variables, JSON_FORCE_OBJECT),
