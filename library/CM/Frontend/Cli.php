@@ -53,7 +53,7 @@ class CM_Frontend_Cli extends CM_Cli_Runnable_Abstract {
         $faviconConfigList = $this->_getFaviconConfigList();
         $this->_getStreamOutput()->writeln('Generating favicons');
 
-        $themeDirStructList = Functional\map(CM_Site_Abstract::getAll(), function (CM_Site_Abstract $site) {
+        $themeDirStructList = Functional\map((new CM_Paging_Site_All())->getItems(), function (CM_Site_Abstract $site) {
             $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
             return [
                 'render'   => $render,

@@ -63,5 +63,34 @@
                 "name": "context_extra_type_1_createdAt_1"
             }
         }
+    ],
+    "cm_site_settings": [
+        {
+            "key": {
+                "_id": 1
+            },
+            "options": {
+                "name": "_id_"
+            }
+        },
+        {
+            "key": {
+                "_type": 1
+            },
+            "options": {
+                "unique": true,
+                "name": "_type_1"
+            }
+        },
+        {
+            "key": {
+                "default": 1
+            },
+            "options": {
+                "unique": true,
+                "name": "default_1",
+                "sparse": true
+            }
+        }
     ]
 }

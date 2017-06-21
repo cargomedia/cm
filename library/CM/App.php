@@ -38,7 +38,7 @@ class CM_App implements CM_Service_ManagerAwareInterface {
         $assetList = array();
 
         $debug = CM_Bootloader::getInstance()->isDebug();
-        $siteList = CM_Site_Abstract::getAll();
+        $siteList = (new CM_Paging_Site_All())->getItems();
         $languageList = new CM_Paging_Language_Enabled();
 
         foreach ($siteList as $site) {

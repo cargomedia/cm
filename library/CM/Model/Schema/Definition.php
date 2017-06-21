@@ -124,7 +124,12 @@ class CM_Model_Schema_Definition {
                                 throw new CM_Model_Exception_Validation('Field type is not a valid class/interface', null, ['type' => $type]);
                             }
                             $className = $type;
-                            if (is_a($className, 'CM_Model_Abstract', true)) {
+                            if (is_a($className, CM_Site_Abstract::class, true)) {
+                            /** @var CM_Site_Abstract $type */
+                                $id = $value;//TODO check if we need JSON encoded values
+                                $value = CM_Site_Abstract::factoryFromId($id);
+                            }
+                            elseif (is_a($className, 'CM_Model_Abstract', true)) {
                                 /** @var CM_Model_Abstract $type */
                                 if ($this->_isJson($value)) {
                                     $value = CM_Util::jsonDecode($value);

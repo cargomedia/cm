@@ -25,7 +25,7 @@ class CM_Http_ResponseFactoryTest extends CMTest_TestCase {
         }
     }
 
-    public function testGetResponseResouce() {
+    public function testGetResponseResource() {
         $responses = array();
         $responses['/library-css'] = 'CM_Http_Response_Resource_Css_Library';
         $responses['/vendor-css'] = 'CM_Http_Response_Resource_Css_Vendor';
@@ -38,7 +38,7 @@ class CM_Http_ResponseFactoryTest extends CMTest_TestCase {
         $factory = new CM_Http_ResponseFactory($this->getServiceManager(), $responseClassList);
 
         foreach ($responses as $path => $expectedResponse) {
-            $request = new CM_Http_Request_Get($path . '/' . $site->getId() . '/timestamp', ['host' => $site->getHost()]);
+            $request = new CM_Http_Request_Get($path . '/' . $site->getType() . '/timestamp', ['host' => $site->getHost()]);
             $this->assertInstanceOf($expectedResponse, $factory->getResponse($request));
         }
     }

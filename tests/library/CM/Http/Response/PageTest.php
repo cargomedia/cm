@@ -62,7 +62,7 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessHostWithoutWww() {
-        $site = $this->getMockSite(null, null, ['url' => 'http://www.my-site.com']);
+        $site = $this->getMockSite(null, ['url' => 'http://www.my-site.com']);
         $request = new CM_Http_Request_Get('/mock5?foo=bar', ['host' => 'my-site.com']);
         $response = CM_Http_Response_Page::createFromRequest($request, $site, $this->getServiceManager());
         $response->process();
@@ -71,9 +71,9 @@ class CM_Http_Response_PageTest extends CMTest_TestCase {
     }
 
     public function testProcessSiteMatchingByPath() {
-        $site1 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/foo', 'urlCdn' => 'http://cdn-foo.my-site.com']);
-        $site2 = $this->getMockSite(null, null, ['url' => 'http://my-site.com/bar', 'urlCdn' => 'http://cdn-bar.my-site.com']);
-        $site3 = $this->getMockSite(null, null, ['url' => 'http://my-site.com', 'urlCdn' => 'http://cdn.my-site.com']);
+        $site1 = $this->getMockSite(null, ['url' => 'http://my-site.com/foo']);
+        $site2 = $this->getMockSite(null, ['url' => 'http://my-site.com/bar']);
+        $site3 = $this->getMockSite(null, ['url' => 'http://my-site.com']);
 
         $expectedList = [
             '/foo/mock5?foo=bar' => $site1,

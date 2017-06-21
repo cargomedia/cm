@@ -98,7 +98,7 @@ class CM_Model_User extends CM_Model_Abstract {
         if (null === $siteType) {
             return $siteFactory->getDefaultSite();
         }
-        return $siteFactory->getSiteById($siteType);
+        return $siteFactory->getSiteByType($siteType);
     }
 
     /**
