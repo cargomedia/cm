@@ -24,11 +24,10 @@ class CM_Model_StorageAdapter_DatabaseTest extends CMTest_TestCase {
     }
 
     public function testGetTableName() {
-        CM_Config::get()->CM_Model_Abstract = new stdClass();
-        CM_Config::get()->CM_Model_Abstract->types = array(
+        CM_Config::get()->CM_Model_Abstract->types += [
             1 => 'CMTest_ModelMock_1',
             2 => 'CMTest_ModelMock_2',
-        );
+        ];
 
         $adapter = new CM_Model_StorageAdapter_Database();
         $method = CMTest_TH::getProtectedMethod('CM_Model_StorageAdapter_Database', '_getTableName');
