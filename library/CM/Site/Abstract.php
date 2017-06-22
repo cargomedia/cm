@@ -339,7 +339,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         $siteType = $cache->get('siteType:' . $id, function () use ($id) {
             $mongo = CM_Service_Manager::getInstance()->getMongoDb();
             $typeRes = $mongo->findOne(self::getTableName(), ['_id' => CM_MongoDb_Client::getObjectId($id)], ['_type' => 1]);
-            return $typeRes['_type'];
+            return (null !== $typeRes && array_key_exists('_type', $typeRes)) ? $typeRes['_type'] : null;
         });
         if (null === $siteType) {
             throw new CM_Exception_Nonexistent('Site doesn\'t exist', null, ['siteId' => $id]);
