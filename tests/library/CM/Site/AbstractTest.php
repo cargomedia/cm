@@ -1,7 +1,5 @@
 <?php
 
-use CM\Url\BaseUrl;
-
 class CM_Site_AbstractTest extends CMTest_TestCase {
 
     /** @var CM_Site_Abstract */
@@ -65,14 +63,14 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
     public function testEquals() {
         $siteFoo = $this->mockClass('CM_Site_Abstract');
-        $siteFoo->mockMethod('getUrl')->set(BaseUrl::create('http://foo.com'));
+        $siteFoo->mockMethod('getUrlString')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteFoo1 */
         $siteFoo1 = $siteFoo->newInstance();
         /** @var CM_Site_Abstract $siteFoo2 */
         $siteFoo2 = $siteFoo->newInstance();
 
         $siteBar = $this->mockClass('CM_Site_Abstract');
-        $siteBar->mockMethod('getUrl')->set(BaseUrl::create('http://foo.com'));
+        $siteBar->mockMethod('getUrlString')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteBar1 */
         $siteBar1 = $siteBar->newInstance();
 
@@ -92,11 +90,11 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
         $site1 = $siteClass->newInstance();
-        $site1->mockMethod('getUrl')->set(BaseUrl::create('http://my-site1.com'));
+        $site1->mockMethod('getUrlString')->set('http://my-site1.com');
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site2 */
         $site2 = $siteClass->newInstance();
-        $site2->mockMethod('getUrl')->set(BaseUrl::create('http://my-site2.com'));
+        $site2->mockMethod('getUrlString')->set('http://my-site2.com');
 
         $this->assertSame(false, $site1->equals($site2));
     }

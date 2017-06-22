@@ -333,12 +333,16 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
      */
     public static function factoryFromId($id) {
         $id = (string) $id;
-        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        $typeRes = $mongo->findOne(self::getTableName(), ['_id' => CM_MongoDb_Client::getObjectId($id)], ['_type' => 1]);
-        if (null === $typeRes) {
+        $cache = CM_Cache_Local::getInstance();
+        $siteType = $cache->get('siteType:' . $id, function () use ($id) {
+            $mongo = CM_Service_Manager::getInstance()->getMongoDb();
+            $typeRes = $mongo->findOne(self::getTableName(), ['_id' => CM_MongoDb_Client::getObjectId($id)], ['_type' => 1]);
+            return $typeRes['_type'];
+        });
+        if (null === $siteType) {
             throw new CM_Exception_Nonexistent('Site doesn\'t exist', null, ['siteId' => $id]);
         }
-        return self::factoryFromType($id, $typeRes['_type']);
+        return self::factoryFromType($id, $siteType);
     }
 
     /**
