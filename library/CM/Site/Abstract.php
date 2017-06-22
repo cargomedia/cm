@@ -116,12 +116,10 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
      * @return bool
      */
     public function getDefault() {
-        //TODO try to get rid of direct mongoDb usage. problem is setDefault resets only current object's cache while modifies all collection
-        $mongo = CM_Service_Manager::getInstance()->getMongoDb();
-        return null !== $mongo->findOne(self::getTableName(), [
-            '_id'     => CM_MongoDb_Client::getObjectId($this->getId()),
-            'default' => true,
-        ]);
+        if (!$this->_has('default')) {
+            return false;
+        }
+        return $this->_get('default');
     }
 
     /**
@@ -132,6 +130,10 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         $mongo->updateMany(self::getTableName(), [], ['$unset' => ['default' => 1]]);
         if (true === $isDefault) {
             $this->_set('default', true);
+        }
+        foreach ((new CM_Paging_Site_All())->getItems() as $site) {
+            /** @var CM_Site_Abstract $site */
+            $site->_change();
         }
     }
 
