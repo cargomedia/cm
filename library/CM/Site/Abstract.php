@@ -278,7 +278,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
             return false;
         }
         /** @var $other CM_Site_Abstract */
-        return (string) $this->getUrl() === (string) $other->getUrl();
+        return $this->getUrlString() === $other->getUrlString();
     }
 
     protected function _getSchema() {
