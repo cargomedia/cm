@@ -125,11 +125,10 @@ class CM_Model_Schema_Definition {
                             }
                             $className = $type;
                             if (is_a($className, CM_Site_Abstract::class, true)) {
-                            /** @var CM_Site_Abstract $type */
-                                $id = $value;//TODO check if we need JSON encoded values
+                                /** @var CM_Site_Abstract $type */
+                                $id = $value;
                                 $value = CM_Site_Abstract::factoryFromId($id);
-                            }
-                            elseif (is_a($className, 'CM_Model_Abstract', true)) {
+                            } elseif (is_a($className, 'CM_Model_Abstract', true)) {
                                 /** @var CM_Model_Abstract $type */
                                 if ($this->_isJson($value)) {
                                     $value = CM_Util::jsonDecode($value);

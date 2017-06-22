@@ -64,7 +64,7 @@
             }
         }
     ],
-    "cm_site_settings": [
+    "cm_site": [
         {
             "key": {
                 "_id": 1

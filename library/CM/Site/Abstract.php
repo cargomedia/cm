@@ -354,7 +354,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     public static function getTableName() {
-        return 'cm_site_settings';
+        return 'cm_site';
     }
 
     /**

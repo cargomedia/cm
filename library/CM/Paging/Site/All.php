@@ -3,7 +3,7 @@
 class CM_Paging_Site_All extends CM_Paging_Abstract {
 
     public function __construct() {
-        $source = new CM_PagingSource_MongoDb('cm_site_settings', [], ['_type' => 1]);
+        $source = new CM_PagingSource_MongoDb('cm_site', [], ['_type' => 1]);
         $source->enableCache();
         parent::__construct($source);
     }
