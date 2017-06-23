@@ -113,11 +113,11 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     public function testDefault() {
         $site = $this->_site;
         $this->assertSame(false, $site->getDefault());
-        $site->setDefault(true);
+        $site->setDefault();
         $this->assertSame(true, $site->getDefault());
 
         $site2 = $this->getMockSite();
-        $site2->setDefault(true);
+        $site2->setDefault();
         CMTest_TH::reinstantiateModel($site);
         CMTest_TH::reinstantiateModel($site2);
         $this->assertSame(false, $site->getDefault());

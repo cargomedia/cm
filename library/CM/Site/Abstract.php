@@ -122,15 +122,10 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         return $this->_get('default');
     }
 
-    /**
-     * @param bool $isDefault
-     */
-    public function setDefault($isDefault) {
+    public function setDefault() {
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
         $mongo->updateMany(self::getTableName(), [], ['$unset' => ['default' => 1]]);
-        if (true === $isDefault) {
-            $this->_set('default', true);
-        }
+        $this->_set('default', true);
         foreach ((new CM_Paging_Site_All())->getItems() as $site) {
             /** @var CM_Site_Abstract $site */
             $site->_change();

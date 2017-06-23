@@ -92,7 +92,7 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf('CM_Exception_Invalid', $exception);
         $this->assertSame('Default site is not set', $exception->getMessage());
-        $site2->setDefault(true);
+        $site2->setDefault();
         $this->assertEquals($site2, $siteFactory->getDefaultSite());
     }
 

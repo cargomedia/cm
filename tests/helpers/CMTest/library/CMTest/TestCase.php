@@ -385,7 +385,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
                 'emailAddress' => 'default@default.dev',
             ]
         );
-        $defaultSite->setDefault(true);
+        $defaultSite->setDefault();
     }
 
     /**
