@@ -365,16 +365,4 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     public static function getAll() {
         return (new CM_Paging_Site_All())->getItems();
     }
-
-    /**
-     * @param array $data
-     * @return static
-     */
-    protected static function _createStatic(array $data) {
-        $type = static::getTypeStatic();
-        $site = new static();
-        $site->_set(array_merge($data, ['_type' => $type]));
-        $site->commit();
-        return $site;
-    }
 }
