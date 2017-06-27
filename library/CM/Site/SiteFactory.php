@@ -10,7 +10,7 @@ class CM_Site_SiteFactory {
      */
     public function __construct(array $siteList = null) {
         if (null === $siteList) {
-            $siteList = CM_Site_Abstract::getAll();
+            $siteList = (new CM_Paging_Site_All())->getItems();
         }
 
         usort($siteList, function (CM_Site_Abstract $site1, CM_Site_Abstract $site2) {
@@ -53,26 +53,56 @@ class CM_Site_SiteFactory {
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @return CM_Site_Abstract|null
      */
     public function findSiteById($id) {
-        $id = (int) $id;
+        $id = (string) $id;
         return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($id) {
             return $site->getId() === $id;
         });
     }
 
     /**
-     * @param int $id
+     * @param string $id
      * @return CM_Site_Abstract
      * @throws CM_Exception_Invalid
      */
     public function getSiteById($id) {
-        $id = (int) $id;
+        $id = (string) $id;
         $site = $this->findSiteById($id);
         if (null === $site) {
             throw new CM_Exception_Invalid('Site is not found', null, ['siteId' => $id]);
+        }
+        return $site;
+    }
+
+    /**
+     * These 2 method were temporary added till we resolve ambiguity related to splitting siteId and type
+     * especially for models where type is currently stored.
+     *
+     * @param int $type
+     * @return CM_Site_Abstract|null
+     * @deprecated use site `id` when it's possible
+     */
+    public function findSiteByType($type) {
+        $type = (int) $type;
+        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($type) {
+            return $site->getType() === $type;
+        });
+    }
+
+    /**
+     * @param int $type
+     * @return CM_Site_Abstract
+     * @throws CM_Exception_Invalid
+     * @deprecated use binding by id, in the future site `type` will be not unique
+     */
+    public function getSiteByType($type) {
+        $type = (int) $type;
+        $site = $this->findSiteByType($type);
+        if (null === $site) {
+            throw new CM_Exception_Invalid('Site is not found', null, ['type' => $type]);
         }
         return $site;
     }
@@ -82,13 +112,13 @@ class CM_Site_SiteFactory {
      * @throws CM_Exception_Invalid
      */
     public function getDefaultSite() {
-        $config = CM_Config::get();
-        if (empty($config->CM_Site_Abstract->class) || !is_subclass_of($config->CM_Site_Abstract->class, 'CM_Site_Abstract', true)) {
+        $defaultSite = \Functional\first($this->_siteList, function (CM_Site_Abstract $site) {
+            return true === $site->getDefault();
+        });
+        if (null === $defaultSite) {
             throw new CM_Exception_Invalid('Default site is not set');
         }
-        /** @type CM_Site_Abstract $siteClassName */
-        $siteClassName = $config->CM_Site_Abstract->class;
-        return $this->getSiteById($siteClassName::getTypeStatic());
+        return $defaultSite;
     }
 
 }

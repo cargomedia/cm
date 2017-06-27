@@ -18,7 +18,7 @@ class smarty_function_imgTest extends CMTest_TestCase {
         $smarty = new Smarty();
         $render = new CM_Frontend_Render();
 
-        $siteOther = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $siteOther = $this->getMockSite('CM_Site_Abstract', ['urlCdn' => 'http://cdn.other.com']);
         $renderOther = new CM_Frontend_Render(new CM_Frontend_Environment($siteOther));
 
         $template = $smarty->createTemplate('string:');

@@ -2,11 +2,6 @@
 
 class CM_Frontend_RenderTest extends CMTest_TestCase {
 
-    protected function setUp() {
-        CM_Config::get()->CM_Site_Abstract->url = 'http://www.default.dev';
-        CM_Config::get()->CM_Site_Abstract->urlCdn = 'http://cdn.default.dev';
-    }
-
     public function tearDown() {
         CMTest_TH::clearEnv();
     }
@@ -26,12 +21,15 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render->getEnvironment()->setLanguage($language);
         $this->assertSame('http://www.default.dev/foo/bar', $render->getUrl('/foo/bar'));
 
-        $site = $this->getMockSite(null, null, array(
-            'url'          => 'http://www.test.dev',
-            'urlCdn'       => 'http://cdn.test.dev',
-            'name'         => 'Test',
-            'emailAddress' => 'test@test.dev',
-        ));
+        $site = $this->getMockSite(null,
+            [
+                'url'    => 'http://www.test.dev',
+                'urlCdn' => 'http://cdn.test.dev',
+            ], [
+                'name'         => 'Test',
+                'emailAddress' => 'test@test.dev',
+            ]
+        );
         $this->assertSame('http://www.test.dev/foo/bar', $render->getUrl('/foo/bar', $site));
     }
 
@@ -65,12 +63,15 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $render = new CM_Frontend_Render();
         $page = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Foo_Bar_FooBar', false);
 
-        $site = $this->getMockSite(null, null, array(
-            'url'          => 'http://www.test.dev',
-            'urlCdn'       => 'http://cdn.test.dev',
-            'name'         => 'Test',
-            'emailAddress' => 'test@test.dev',
-        ));
+        $site = $this->getMockSite(null,
+            [
+                'url'    => 'http://www.test.dev',
+                'urlCdn' => 'http://cdn.test.dev',
+            ], [
+                'name'         => 'Test',
+                'emailAddress' => 'test@test.dev',
+            ]
+        );
         $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
         $this->assertSame('http://www.test.dev/foo/bar/foo-bar',
@@ -104,14 +105,16 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
         $this->assertSame('Site does not contain namespace', $exception->getMessage());
         $this->assertSame(['site' => get_class($render->getEnvironment()->getSite()), 'namespace' => 'FOO'], $exception->getMetaInfo());
 
-        $site = $this->getMockSite(null, null, array(
-            'url'          => 'http://www.test.dev',
-            'urlCdn'       => 'http://cdn.test.dev',
-            'name'         => 'Test',
-            'emailAddress' => 'test@test.dev',
-        ), ['getModules']);
-        $site->expects($this->any())->method('getModules')->willReturn(['CM', 'FOO']);
-
+        $site = $this->getMockSite(null,
+            [
+                'url'    => 'http://www.test.dev',
+                'urlCdn' => 'http://cdn.test.dev',
+            ], [
+                'name'         => 'Test',
+                'emailAddress' => 'test@test.dev'
+            ]
+        );
+        $site->mockMethod('getModules')->set(['CM', 'FOO']);
         $renderSite = new CM_Frontend_Render(new CM_Frontend_Environment($site));
 
         $this->assertSame('http://www.test.dev/test123', $renderSite->getUrlPage($page));
@@ -130,7 +133,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlResourceDifferentSite() {
         $render = new CM_Frontend_Render();
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $site = $this->getMockSite('CM_Site_Abstract', ['urlCdn' => 'http://cdn.other.com']);
         $siteType = $site->getType();
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/layout/' . $siteType . '/' . $deployVersion . '/foo/bar.jpg',
@@ -147,7 +150,7 @@ class CM_Frontend_RenderTest extends CMTest_TestCase {
 
     public function testGetUrlStaticDifferentSite() {
         $render = new CM_Frontend_Render();
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['urlCdn' => 'http://cdn.other.com']);
+        $site = $this->getMockSite('CM_Site_Abstract', ['urlCdn' => 'http://cdn.other.com']);
         $deployVersion = CM_App::getInstance()->getDeployVersion();
         $this->assertSame('http://cdn.other.com/static/foo.jpg?' . $deployVersion, $render->getUrlStatic('/foo.jpg', $site));
     }

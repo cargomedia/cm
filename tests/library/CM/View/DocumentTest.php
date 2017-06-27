@@ -14,13 +14,10 @@ class CM_View_DocumentTest extends CMTest_TestCase {
     }
 
     public function testRender() {
-        $site = $this->getMockSite('CM_Site_Abstract', null, [
-            'url'  => 'http://www.my-website.net',
-            'name' => 'My website',
-        ]);
+        $site = $this->getMockSite('CM_Site_Abstract', ['url' => 'http://www.my-website.net'], ['name' => 'My website']);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
+        $this->getMockForAbstractClass('CM_Layout_Abstract', [], 'CM_Layout_Default');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', [], 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
@@ -32,10 +29,10 @@ class CM_View_DocumentTest extends CMTest_TestCase {
     }
 
     public function testTrackingDisabled() {
-        $site = $this->getMockSite('CM_Site_Abstract', null, ['url' => 'http://www.my-website.net']);
+        $site = $this->getMockSite('CM_Site_Abstract', ['url' => 'http://www.my-website.net']);
         $render = new CM_Frontend_Render(new CM_Frontend_Environment($site));
-        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
+        $this->getMockForAbstractClass('CM_Layout_Abstract', [], 'CM_Layout_Default');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', [], 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
@@ -45,11 +42,11 @@ class CM_View_DocumentTest extends CMTest_TestCase {
     }
 
     public function testTrackingGuest() {
-        $siteMock = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
+        $siteMock = $this->getMockSite('CM_Site_Abstract', ['url' => 'http://www.example.com']);
         $environment = new CM_Frontend_Environment($siteMock);
         $render = new CM_Frontend_Render($environment, $this->_getServiceManager('ga123', 'km123'));
-        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
+        $this->getMockForAbstractClass('CM_Layout_Abstract', [], 'CM_Layout_Default');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', [], 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
@@ -63,7 +60,7 @@ class CM_View_DocumentTest extends CMTest_TestCase {
     }
 
     public function testTrackingViewer() {
-        $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
+        $site = $this->getMockSite('CM_Site_Abstract', ['url' => 'http://www.example.com']);
         $mockBuilder = $this->getMockBuilder('CM_Model_User');
         $mockBuilder->setMethods(['getIdRaw', 'getVisible', 'getLanguage']);
         $viewerMock = $mockBuilder->getMock();
@@ -73,8 +70,8 @@ class CM_View_DocumentTest extends CMTest_TestCase {
         /** @var CM_Model_User $viewerMock */
         $environment = new CM_Frontend_Environment($site, $viewerMock);
         $render = new CM_Frontend_Render($environment, $this->_getServiceManager('ga123', 'km123'));
-        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
-        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', array(), 'CM_Page_Mock' . uniqid());
+        $this->getMockForAbstractClass('CM_Layout_Abstract', [], 'CM_Layout_Default');
+        $pageMock = $this->getMockForAbstractClass('CM_Page_Abstract', [], 'CM_Page_Mock' . uniqid());
         /** @var CM_Page_Abstract $pageMock */
         $renderAdapter = new CM_RenderAdapter_Document($render, $pageMock);
         $html = $renderAdapter->fetch();
@@ -88,14 +85,14 @@ class CM_View_DocumentTest extends CMTest_TestCase {
     }
 
     public function testLanguageAlternatives() {
-        $site = $this->getMockSite('CM_Site_Abstract', null, array('url' => 'http://www.example.com'));
+        $site = $this->getMockSite('CM_Site_Abstract', ['url' => 'http://www.example.com']);
         $language1 = CMTest_TH::createLanguage('fr');
         $language2 = CMTest_TH::createLanguage('de');
 
         $environment = new CM_Frontend_Environment($site, null, $language2, null, true);
         $render = new CM_Frontend_Render($environment);
 
-        $this->getMockForAbstractClass('CM_Layout_Abstract', array(), 'CM_Layout_Default');
+        $this->getMockForAbstractClass('CM_Layout_Abstract', [], 'CM_Layout_Default');
         $page = new CM_Page_Example();
         $renderAdapter = new CM_RenderAdapter_Document($render, $page);
         $html = $renderAdapter->fetch();

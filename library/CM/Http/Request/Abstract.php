@@ -262,12 +262,12 @@ abstract class CM_Http_Request_Abstract {
      * @return CM_Site_Abstract
      */
     public function popPathSite() {
-        $siteId = $this->popPathPart();
+        $siteType = $this->popPathPart();
         $siteFactory = new CM_Site_SiteFactory();
-        if ('null' === $siteId) {
+        if ('null' === $siteType) {
             return $siteFactory->getDefaultSite();
         }
-        return $siteFactory->getSiteById($siteId);
+        return $siteFactory->getSiteByType($siteType);
     }
 
     /**

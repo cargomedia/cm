@@ -16,8 +16,7 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
     }
 
     public function testGetCollectionName() {
-        CM_Config::get()->CM_Model_Abstract = new stdClass();
-        CM_Config::get()->CM_Model_Abstract->types = [
+        CM_Config::get()->CM_Model_Abstract->types += [
             1 => 'CMTest_ModelMock_3',
             2 => 'CMTest_ModelMock_4',
         ];
