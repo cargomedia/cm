@@ -1,45 +1,16 @@
-language: php
-
-php:
-  - 5.6
+sudo: required
 
 services:
-  - mysql
-  - memcached
-  - elasticsearch
-  - redis-server
+  - docker
 
-addons:
-  apt:
-    sources:
-      - mongodb-upstart
-    packages:
-      - libgearman-dev
-      - mongodb-org-server
-      - re2c
+env:
+  DOCKER_COMPOSE_VERSION: 1.13.0
 
-before_script:
-  - phpenv config-rm xdebug.ini
-  - tests/travis/install-php-runkit.sh
-  - source tests/travis/install-phantomjs.sh
-  - yes '' | travis_retry pecl install imagick
-  - travis_retry pecl install stats-1.0.3
-  - travis_retry pecl install gearman-1.0.3
-  - yes '' | travis_retry pecl install apcu-4.0.10
-  - travis_retry pecl -q install mongodb-1.2.0alpha3
-  - phpenv config-add tests/travis/php.ini
-  - npm install -g autoprefixer@4.0.0
-  - npm install -g uglify-js@2.4.13
-  - npm install -g browserify@11.2.0
-  - composer install
-  - cp tests/travis/config.php resources/config/local.php
-  - bin/cm app set-config deploy '{"deployVersion":'$(date +"%s")'}'
+before_install:
+  - sudo rm /usr/local/bin/docker-compose
+  - curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname -s`-`uname -m` > docker-compose
+  - chmod +x docker-compose
+  - sudo mv docker-compose /usr/local/bin
 
 script:
-  - bin/phpunit
-  - bin/qunit
-
-sudo: false
-
-notifications:
-  email: false
+  - docker-compose up --exit-code-from test
