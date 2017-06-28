@@ -41,8 +41,11 @@ class CM_Elasticsearch_Index_Cli extends CM_Cli_Runnable_Abstract {
         }
     }
 
-    public function optimize() {
-        CM_Service_Manager::getInstance()->getElasticsearch()->getClient()->optimizeIndex('_all');
+    /**
+     * @param array|null $options
+     */
+    public function optimize(array $options = null) {
+        CM_Service_Manager::getInstance()->getElasticsearch()->getClient()->optimizeIndex('_all', $options);
     }
 
     /**

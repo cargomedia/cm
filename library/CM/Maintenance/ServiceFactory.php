@@ -58,6 +58,11 @@ class CM_Maintenance_ServiceFactory implements CM_Service_ManagerAwareInterface 
                 (new CM_Elasticsearch_Index_Cli())->optimize();
             }
         ], $maintenance);
+        $this->_registerClockworkCallbacks('1 day', [
+            'CM_Elasticsearch_Index_Cli::optimizeExpungeDeletes' => function (DateTime $lastRuntime = null) {
+                (new CM_Elasticsearch_Index_Cli())->optimize(['only_expunge_deletes' => true]);
+            }
+        ], $maintenance);
 
         if ($this->getServiceManager()->has('janus')) {
             $this->_registerClockworkCallbacks('1 minute', [
