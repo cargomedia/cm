@@ -263,6 +263,21 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
+     * @return boolean
+     */
+    public function isRobotIndexingDisallowed() {
+        return $this->_get('robotIndexingDisallowed');
+    }
+
+    /**
+     * @param boolean|null $value
+     */
+    public function setRobotIndexingDisallowed($value = null) {
+        $value = (null !== $value) ? (boolean) $value : true;
+        $this->_set('robotIndexingDisallowed', $value);
+    }
+
+    /**
      * @param CM_Comparable $other
      * @return bool
      * @throws CM_Exception_Invalid
@@ -280,9 +295,10 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
 
     protected function _getSchema() {
         return new CM_Model_Schema_Definition([
-            'name'         => ['type' => 'string'],
-            'emailAddress' => ['type' => 'string'],
-            'default'      => ['type' => 'bool', 'optional' => true],
+            'name'                    => ['type' => 'string'],
+            'emailAddress'            => ['type' => 'string'],
+            'robotIndexingDisallowed' => ['type' => 'boolean'],
+            'default'                 => ['type' => 'bool', 'optional' => true],
         ]);
     }
 
