@@ -21,6 +21,7 @@ addons:
 before_script:
   - phpenv config-rm xdebug.ini
   - tests/travis/install-php-runkit.sh
+  - tests/travis/install-php-timecop.sh
   - source tests/travis/install-phantomjs.sh
   - yes '' | travis_retry pecl install imagick
   - travis_retry pecl install stats-1.0.3
