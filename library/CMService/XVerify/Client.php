@@ -1,6 +1,6 @@
 <?php
 
-class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInterface {
+class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
 
     /** @var string */
     protected $_domain, $_code;
@@ -16,7 +16,7 @@ class CMService_XVerify_Client implements CM_Service_EmailVerification_ClientInt
 
     public function isValid($email) {
         $email = (string) $email;
-        if (false === filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        if (!parent::isValid($email)) {
             return false;
         }
         $key = __METHOD__ . '_email:' . $email;
