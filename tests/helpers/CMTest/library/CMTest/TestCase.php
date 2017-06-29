@@ -42,7 +42,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
      * @return string
      */
     public function generateMockClassName($className) {
-        return 'Mock_' . $className . '_' . substr(md5(uniqid(mt_rand())), 0, 8);
+        return 'Mock_' . str_replace('\\', '_', $className) . '_' . substr(md5(uniqid(mt_rand())), 0, 8);
     }
 
     /**
