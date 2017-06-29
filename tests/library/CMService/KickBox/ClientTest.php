@@ -9,51 +9,51 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $kickBoxMock = $mockBuilder->getMock();
         $kickBoxMock->expects($this->never())->method('_getResponseBody');
         /** @var CMService_KickBox_Client $kickBoxMock */
-        $this->assertFalse($kickBoxMock->isValid('invalid email@example.com'));
+        $this->assertFalse($kickBoxMock->isValid('invalid email@google.com'));
     }
 
     public function testNoCredits() {
         $responseBodyMock = null;
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testNoCredits@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testNoCredits@google.com'));
     }
 
     public function testInvalid() {
         $responseBodyMock = array('result' => 'invalid', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.2);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertFalse($kickBoxMock->isValid('testInvalid@example.com'));
+        $this->assertFalse($kickBoxMock->isValid('testInvalid@google.com'));
         $kickBoxMock = $this->_getKickBoxMock(false, true, 0.2, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testInvalid@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testInvalid@google.com'));
     }
 
     public function testDisposable() {
         $responseBodyMock = array('result' => 'valid', 'disposable' => true, 'accept_all' => false, 'sendex' => 0.2);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertFalse($kickBoxMock->isValid('testDisposable@example.com'));
+        $this->assertFalse($kickBoxMock->isValid('testDisposable@google.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, false, 0.2, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testDisposable@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testDisposable@google.com'));
     }
 
     public function testAcceptAll() {
         $responseBodyMock = array('result' => 'valid', 'disposable' => false, 'accept_all' => true, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertFalse($kickBoxMock->isValid('testAcceptAll@example.com'));
+        $this->assertFalse($kickBoxMock->isValid('testAcceptAll@google.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.19, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testAcceptAll@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testAcceptAll@google.com'));
     }
 
     public function testUnknown() {
         $responseBodyMock = array('result' => 'unknown', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertFalse($kickBoxMock->isValid('testUnknown@example.com'));
+        $this->assertFalse($kickBoxMock->isValid('testUnknown@google.com'));
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.19, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testUnknown@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testUnknown@google.com'));
     }
 
     public function testValid() {
         $responseBodyMock = array('result' => 'valid', 'disposable' => false, 'accept_all' => false, 'sendex' => 0.19);
         $kickBoxMock = $this->_getKickBoxMock(true, true, 0.2, $responseBodyMock);
-        $this->assertTrue($kickBoxMock->isValid('testValid@example.com'));
+        $this->assertTrue($kickBoxMock->isValid('testValid@google.com'));
     }
 
     public function testHandleExceptionNoCredits() {
@@ -65,7 +65,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->throwException($exception));
         $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
-        $kickBoxMock->isValid('test@example.com');
+        $kickBoxMock->isValid('test@google.com');
     }
 
     public function testHandleInvalidResponseCodeNoCredits() {
@@ -76,14 +76,14 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         $kickBoxMock = $mockBuilder->getMock();
         $kickBoxMock->expects($this->once())->method('_getResponse')->will($this->returnValue($responseMock));
         $exception = new CM_Exception('Invalid KickBox email validation response', null, [
-            'email'   => 'test@example.com',
+            'email'   => 'test@google.com',
             'code'    => 403,
             'headers' => array('header' => 'value'),
             'body'    => array('result' => 'unknown'),
         ]);
         $kickBoxMock->expects($this->once())->method('_logException')->with($exception);
         /** @var CMService_KickBox_Client $kickBoxMock */
-        $kickBoxMock->isValid('test@example.com');
+        $kickBoxMock->isValid('test@google.com');
     }
 
     public function testLogExceptionTimeout() {
@@ -108,7 +108,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
             });
 
             /** @var CMService_KickBox_Client $kickBoxMock */
-            $kickBoxMock->isValid('testLogExceptionTimeout@example.com');
+            $kickBoxMock->isValid('testLogExceptionTimeout@google.com');
             $this->assertSame(++$i, $logException->getCallCount());
         }
     }
@@ -127,7 +127,7 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         });
 
         /** @var CMService_KickBox_Client $kickBoxMock */
-        $kickBoxMock->isValid('testLogExceptionOther@example.com');
+        $kickBoxMock->isValid('testLogExceptionOther@google.com');
         $this->assertSame(1, $logException->getCallCount());
     }
 
