@@ -201,10 +201,11 @@ class CM_Elasticsearch_Client {
     }
 
     /**
-     * @param string $indexName
+     * @param string     $indexName
+     * @param array|null $options
      */
-    public function optimizeIndex($indexName) {
-        $this->_getIndices()->optimize(['index' => $indexName]);
+    public function optimizeIndex($indexName, array $options = null) {
+        $this->_getIndices()->optimize(array_merge(['index' => $indexName], (array) $options));
     }
 
     /**

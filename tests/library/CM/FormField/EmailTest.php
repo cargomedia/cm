@@ -6,9 +6,9 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
         $field = new CM_FormField_Email(['name' => 'email']);
         $environment = new CM_Frontend_Environment();
 
-        $this->assertSame('test@example.com', $field->validate($environment, 'test@example.com'));
+        $this->assertSame('test@google.com', $field->validate($environment, 'test@google.com'));
         try {
-            $field->validate($environment, 'test(at)example.com');
+            $field->validate($environment, 'test(at)google.com');
             $this->fail('Invalid email address passed validation');
         } catch (CM_Exception_FormFieldValidation $e) {
             $this->assertTrue(true);
@@ -27,7 +27,7 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
         $field = new CM_FormField_Email(['name' => 'email', 'disable-email-verification' => true]);
         $environment = new CM_Frontend_Environment();
 
-        $this->assertSame('test@example.com', $field->validate($environment, 'test@example.com'));
+        $this->assertSame('test@google.com', $field->validate($environment, 'test@google.com'));
 
         $serviceManager->unregister('email-verification');
         $serviceManager->registerInstance('email-verification', $emailVerificationDefault);
