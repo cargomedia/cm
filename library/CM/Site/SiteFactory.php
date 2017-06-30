@@ -2,7 +2,7 @@
 
 class CM_Site_SiteFactory {
 
-    /** @var CM_Site_Abstract[] */
+    /** @var CM_Site_Abstract[]|null */
     private $_siteList;
 
     /** @var CM_Site_Abstract[]|null */
