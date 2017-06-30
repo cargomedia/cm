@@ -28,23 +28,6 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
         parent::onNotSuccessfulTest($e);
     }
 
-    protected function getMockForAbstractClass($originalClassName, array $arguments = [], $mockClassName = '', $callOriginalConstructor = true, $callOriginalClone = true, $callAutoload = true, $mockedMethods = [], $cloneArguments = false)
-    {
-        if ('' === $mockClassName) {
-            $mockClassName = $this->generateMockClassName($originalClassName);
-        }
-
-        return parent::getMockForAbstractClass($originalClassName, $arguments, $mockClassName, $callOriginalConstructor, $callOriginalClone, $callAutoload, $mockedMethods, $cloneArguments);
-    }
-
-    /**
-     * @param string $className
-     * @return string
-     */
-    public function generateMockClassName($className) {
-        return 'Mock_' . str_replace('\\', '_', $className) . '_' . substr(md5(uniqid(mt_rand())), 0, 8);
-    }
-
     /**
      * @param mixed      $object
      * @param string     $methodName
