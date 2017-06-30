@@ -12,9 +12,6 @@ class CM_Site_SiteFactory {
      * @param CM_Site_Abstract[]|null $siteList
      */
     public function __construct(array $siteList = null) {
-        if (null === $siteList) {
-            $siteList = (new CM_Paging_Site_All())->getItems();
-        }
         $this->_siteList = $siteList;
     }
 
@@ -24,8 +21,7 @@ class CM_Site_SiteFactory {
      */
     public function findSite(CM_Http_Request_Abstract $request) {
         $request = clone $request;
-        $this->_sortSiteList();
-        foreach ($this->_siteListSorted as $site) {
+        foreach ($this->_getSiteListSorted() as $site) {
             if ($site->match($request)) {
                 return $site;
             }
@@ -52,7 +48,7 @@ class CM_Site_SiteFactory {
      */
     public function findSiteById($id) {
         $id = (string) $id;
-        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($id) {
+        return \Functional\first($this->_getSiteList(), function (CM_Site_Abstract $site) use ($id) {
             return $site->getId() === $id;
         });
     }
@@ -81,7 +77,7 @@ class CM_Site_SiteFactory {
      */
     public function findSiteByType($type) {
         $type = (int) $type;
-        return \Functional\first($this->_siteList, function (CM_Site_Abstract $site) use ($type) {
+        return \Functional\first($this->_getSiteList(), function (CM_Site_Abstract $site) use ($type) {
             return $site->getType() === $type;
         });
     }
@@ -106,7 +102,7 @@ class CM_Site_SiteFactory {
      * @throws CM_Exception_Invalid
      */
     public function getDefaultSite() {
-        $defaultSite = \Functional\first($this->_siteList, function (CM_Site_Abstract $site) {
+        $defaultSite = \Functional\first($this->_getSiteList(), function (CM_Site_Abstract $site) {
             return true === $site->getDefault();
         });
         if (null === $defaultSite) {
@@ -115,9 +111,22 @@ class CM_Site_SiteFactory {
         return $defaultSite;
     }
 
-    protected function _sortSiteList() {
+    /**
+     * @return CM_Site_Abstract[]
+     */
+    protected function _getSiteList() {
+        if (null === $this->_siteList) {
+            $this->_siteList = (new CM_Paging_Site_All())->getItems();
+        }
+        return $this->_siteList;
+    }
+
+    /**
+     * @return CM_Site_Abstract[]
+     */
+    protected function _getSiteListSorted() {
         if (null === $this->_siteListSorted) {
-            $siteList = $this->_siteList;
+            $siteList = $this->_getSiteList();
             usort($siteList, function (CM_Site_Abstract $site1, CM_Site_Abstract $site2) {
                 $length1 = mb_strlen($site1->getUrlString());
                 $length2 = mb_strlen($site2->getUrlString());
@@ -128,5 +137,6 @@ class CM_Site_SiteFactory {
             });
             $this->_siteListSorted = $siteList;
         }
+        return $this->_siteListSorted;
     }
 }
