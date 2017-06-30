@@ -17,9 +17,10 @@ class CM_Site_SiteFactoryTest extends CMTest_TestCase {
         ksort($unsorted);
 
         $siteFactory = new CM_Site_SiteFactory($unsorted);
+        $this->callProtectedMethod($siteFactory, '_sortSiteList');
 
         $reflection = new ReflectionClass($siteFactory);
-        $property = $reflection->getProperty('_siteList');
+        $property = $reflection->getProperty('_siteListSorted');
         $property->setAccessible(true);
         $this->assertEquals($sorted, $property->getValue($siteFactory));
     }

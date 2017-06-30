@@ -5,6 +5,9 @@ class CM_Site_SiteFactory {
     /** @var CM_Site_Abstract[] */
     private $_siteList;
 
+    /** @var CM_Site_Abstract[]|null */
+    private $_siteListSorted = null;
+
     /**
      * @param CM_Site_Abstract[]|null $siteList
      */
@@ -12,16 +15,6 @@ class CM_Site_SiteFactory {
         if (null === $siteList) {
             $siteList = (new CM_Paging_Site_All())->getItems();
         }
-
-        usort($siteList, function (CM_Site_Abstract $site1, CM_Site_Abstract $site2) {
-            $length1 = mb_strlen($site1->getUrlString());
-            $length2 = mb_strlen($site2->getUrlString());
-            if ($length1 == $length2) {
-                return 0;
-            }
-            return $length1 > $length2 ? -1 : 1;
-        });
-
         $this->_siteList = $siteList;
     }
 
@@ -31,7 +24,8 @@ class CM_Site_SiteFactory {
      */
     public function findSite(CM_Http_Request_Abstract $request) {
         $request = clone $request;
-        foreach ($this->_siteList as $site) {
+        $this->_sortSiteList();
+        foreach ($this->_siteListSorted as $site) {
             if ($site->match($request)) {
                 return $site;
             }
@@ -121,4 +115,18 @@ class CM_Site_SiteFactory {
         return $defaultSite;
     }
 
+    protected function _sortSiteList() {
+        if (null === $this->_siteListSorted) {
+            $siteList = $this->_siteList;
+            usort($siteList, function (CM_Site_Abstract $site1, CM_Site_Abstract $site2) {
+                $length1 = mb_strlen($site1->getUrlString());
+                $length2 = mb_strlen($site2->getUrlString());
+                if ($length1 == $length2) {
+                    return 0;
+                }
+                return $length1 > $length2 ? -1 : 1;
+            });
+            $this->_siteListSorted = $siteList;
+        }
+    }
 }
