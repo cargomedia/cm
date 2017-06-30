@@ -10,8 +10,9 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
             'url'    => 'http://www.foo.com',
             'urlCdn' => 'http://www.cdn.com',
         ], [
-            'name'         => 'Foo',
-            'emailAddress' => 'foo@foo.com',
+            'name'                    => 'Foo',
+            'emailAddress'            => 'foo@foo.com',
+            'robotIndexingDisallowed' => false,
         ]);
     }
 
@@ -108,6 +109,14 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $site->setName('Bar');
         $this->assertSame('bar@bar.com', $site->getEmailAddress());
         $this->assertSame('Bar', $site->getName());
+
+        $this->assertSame(false, $site->isRobotIndexingDisallowed());
+        $site->setRobotIndexingDisallowed();
+        $this->assertSame(true, $site->isRobotIndexingDisallowed());
+        $site->setRobotIndexingDisallowed(false);
+        $this->assertSame(false, $site->isRobotIndexingDisallowed());
+        $site->setRobotIndexingDisallowed(true);
+        $this->assertSame(true, $site->isRobotIndexingDisallowed());
     }
 
     public function testDefault() {

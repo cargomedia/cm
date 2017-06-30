@@ -94,8 +94,9 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
     public function getMockSite($className = null, array $configuration = null, array $settings = null) {
         $siteClass = $this->getMockSiteClass($className, $configuration);
         $defaultSettings = [
-            'name'         => 'Example site',
-            'emailAddress' => 'hello@example.com',
+            'name'                    => 'Example site',
+            'emailAddress'            => 'hello@example.com',
+            'robotIndexingDisallowed' => false,
         ];
         $settings = array_merge($defaultSettings, (array) $settings);
 
