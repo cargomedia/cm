@@ -12,6 +12,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="msapplication-tap-highlight" content="no">
     <meta name="msapplication-config" content="{resourceUrl path='browserconfig.xml' type='layout'}">
+    {if ($render->getEnvironment()->getSite()->isRobotIndexingDisallowed())}<meta name="robots" content="noindex">{/if}
 
     <link rel="apple-touch-icon" sizes="180x180" href="{resourceUrl path='img/meta/square-180.png' type='layout'}">
 
