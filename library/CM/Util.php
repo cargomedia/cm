@@ -632,7 +632,7 @@ class CM_Util {
      * @return DateTime
      */
     public static function createDateTimeWithMillis() {
-        $timeStruct = CMTest_TH::gettimeofday();
+        $timeStruct = gettimeofday();
         return DateTime::createFromFormat('U.u', $timeStruct['sec'] . '.' . $timeStruct['usec']);
     }
 }
