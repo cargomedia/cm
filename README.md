@@ -244,7 +244,6 @@ Commands:
  generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
  generator create-class <class-name>
  generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
- generator create-site <class-name> <name> <domain>
  generator create-view <class-name>
  job-distribution start-worker
  location outdated [--verbose]
