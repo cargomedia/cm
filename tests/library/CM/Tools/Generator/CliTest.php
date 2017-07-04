@@ -80,40 +80,6 @@ class CM_Tools_Generator_CliTest extends CMTest_TestCase {
         $cli->createView('Foo_Foo_Bar');
     }
 
-    public function testCreateSite() {
-        $app = $this->_mockAppInstallation();
-        $cli = $this->_mockGeneratorCli($app);
-        $this->assertSame(['CM'], $app->getModuleNames());
-        $cli->createModule('Foo');
-        $this->assertSame(['CM', 'Foo'], $app->getModuleNames());
-        $cli->createSite('Foo_Site_Foo', 'Foo', 'foo.com');
-        $this->assertTrue(class_exists('Foo_Site_Foo'));
-        $this->assertSame('CM_Site_Abstract', get_parent_class('Foo_Site_Foo'));
-        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/library/Foo/Site/Foo.php'));
-        $this->assertTrue($app->getFilesystem()->exists('modules/Foo/resources/config/default.php'));
-        $this->assertTrue($app->getFilesystem()->exists('resources/config/local.php'));
-
-        $appDirRoot = $app->getDirRoot();
-        /** @var Closure $configExtendDefault */
-        $configExtendDefault = require $appDirRoot . 'modules/Foo/resources/config/default.php';
-        $this->assertInstanceOf('Closure', $configExtendDefault);
-        /** @var Closure $configExtendLocal */
-        $configExtendLocal = require $appDirRoot . 'resources/config/local.php';
-        $this->assertInstanceOf('Closure', $configExtendLocal);
-
-        $configNode = new CM_Config_Node();
-        $configExtendDefault($configNode);
-        $configExtendLocal($configNode);
-
-        $expectedConfig = [
-            'name'         => 'Foo',
-            'emailAddress' => 'hello@foo.com',
-            'url'          => 'http://www.foo.com',
-            'urlCdn'       => 'http://origin-www.foo.com',
-        ];
-        $this->assertSame($expectedConfig, (array) $configNode->Foo_Site_Foo->export());
-    }
-
     /**
      * @throws CM_Exception_Invalid
      * @throws Exception

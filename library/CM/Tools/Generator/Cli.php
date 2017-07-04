@@ -81,86 +81,6 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
     }
 
     /**
-     * @param string $className
-     * @param string $name
-     * @param string $domain
-     * @throws CM_Exception_Invalid
-     */
-    public function createSite($className, $name, $domain) {
-        $appInstallation = $this->_getAppInstallation();
-        $generatorPhp = new CM_Tools_Generator_Class_Php($appInstallation, $this->_getStreamOutput());
-        $generatorConfig = new CM_Tools_Generator_Config($appInstallation, $this->_getStreamOutput());
-
-        $moduleName = CM_Util::getNamespace($className);
-        $parentClassName = $generatorPhp->getParentClassName($className);
-        if (!is_a($parentClassName, 'CM_Site_Abstract', true)) {
-            throw new CM_Exception_Invalid('Detected parent className `' . $parentClassName . '` is not a `CM_Site_Abstract`.');
-        }
-        $classBlock = $generatorPhp->createClass($className);
-        $classBlock->addMethod(new \CodeGenerator\MethodBlock('__construct', "parent::__construct();\n\$this->_setModule('{$moduleName}');"));
-        $generatorPhp->createClassFileFromClass($classBlock);
-
-        $modulePath = $appInstallation->getModulePath($moduleName);
-        $file = new CM_File($modulePath . 'resources/config/default.php', $appInstallation->getFilesystem());
-        $config = new CM_Config_Node();
-        $config->$className->name = $name;
-        $config->$className->emailAddress = 'hello@' . $domain;
-        $generatorConfig->addEntries($file, $config);
-
-        $file = new CM_File('resources/config/local.php', $appInstallation->getFilesystem());
-        $config = new CM_Config_Node();
-        $config->$className->url = 'http://www.' . $domain;
-        $config->$className->urlCdn = 'http://origin-www.' . $domain;
-        $generatorConfig->addEntries($file, $config);
-
-        (new CM_App_Cli())->generateConfigInternal();
-    }
-
-    /**
-     * @param string|null $projectName
-     * @param string|null $domain
-     * @param string|null $moduleName
-     * @throws CM_Cli_Exception_Internal
-     */
-    public function bootstrapProject($projectName = null, $domain = null, $moduleName = null) {
-        $generatorApp = new CM_Tools_Generator_Application($this->_getAppInstallation(), $this->_getStreamOutput());
-
-        $projectName = $this->_read('Please provide project name (vendor/project):', $projectName, null, function ($value) use ($generatorApp) {
-            if (!$generatorApp->isValidProjectName($value)) {
-                throw new CM_InputStream_InvalidValueException('Project name needs to be in `vendor/project` format');
-            }
-        });
-        list($vendorName, $appName) = explode('/', $projectName);
-
-        $defaultDomain = $appName . '.dev.cargomedia.ch';
-        $hint = "Please provide local domain [{$defaultDomain}]:";
-        $domain = $this->_read($hint, $domain, $defaultDomain, function ($value) use ($generatorApp) {
-            if (!$generatorApp->isValidDomain($value)) {
-                throw new CM_InputStream_InvalidValueException('Invalid domain name');
-            }
-        });
-
-        $defaultModuleName = CM_Util::camelize($appName);
-        $moduleName = $this->_read("Please provide module name [{$defaultModuleName}]:", $moduleName, $defaultModuleName, function ($value) {
-            if (!$this->_isValidModuleName($value)) {
-                throw new CM_InputStream_InvalidValueException('Invalid name');
-            }
-        });
-
-        $siteName = $appName;
-        $siteClassName = $moduleName . '_Site_' . CM_Util::camelize($siteName);
-
-        try {
-            $generatorApp->configureDevEnvironment($appName, $domain);
-            $generatorApp->setProjectName($projectName);
-            $this->createModule($moduleName);
-            $this->createSite($siteClassName, $siteName, $domain);
-        } catch (CM_Exception_Invalid $e) {
-            throw new CM_Cli_Exception_Internal("Bootstrap failed! {$e->getMessage()}");
-        }
-    }
-
-    /**
      * @param string $moduleName
      * @param string $namespace
      * @throws CM_Cli_Exception_Internal
@@ -188,24 +108,6 @@ class CM_Tools_Generator_Cli extends CM_Cli_Runnable_Abstract {
             $this->_appInstallation = new CM_Tools_AppInstallation(DIR_ROOT);
         }
         return $this->_appInstallation;
-    }
-
-    /**
-     * @param string       $hint
-     * @param string|null  $initialValue
-     * @param string|null  $default
-     * @param Closure|null $validateCallback
-     * @return string
-     */
-    private function _read($hint, $initialValue = null, $default = null, Closure $validateCallback = null) {
-        $value = $initialValue;
-        if (null === $value) {
-            $value = $this->_getStreamInput()->read($hint, $default, $validateCallback);
-        }
-        if (null !== $validateCallback) {
-            $validateCallback($value);
-        }
-        return $value;
     }
 
     /**

@@ -241,7 +241,6 @@ Commands:
  db file-to-db
  frontend generate-favicon
  frontend icon-refresh
- generator bootstrap-project [--project-name=<value>] [--domain=<value>] [--module-name=<value>]
  generator create-class <class-name>
  generator create-module <module-name> [--single-module-structure] [--module-path=<value>]
  generator create-view <class-name>
