@@ -594,7 +594,7 @@ abstract class CMTest_TestCase extends PHPUnit_Framework_TestCase implements CM_
                     break;
                 }
             }
-            self::assertTrue($match, 'Needle not contained.');
+            self::assertTrue($match, $message);
         } else {
             parent::assertContains($needle, $haystack, $message, $ignoreCase, $checkForObjectIdentity, $checkForNonObjectIdentity);
         }
