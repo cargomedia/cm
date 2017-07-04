@@ -340,6 +340,21 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
     }
 
     /**
+     * @param string $modelData
+     * @return static
+     */
+    public static function factoryFromModelData($modelData) {
+        $id = self::_castIdRaw([$modelData['_id']]);
+        unset($modelData['_id']);
+        $className = CM_Model_Abstract::_getClassName($modelData['_type']);
+        unset($modelData['_type']);
+        /** @var static $model */
+        $model = new $className();
+        $model->_construct(['id' => $id[0]], $modelData);
+        return $model;
+    }
+
+    /**
      * @param string $id
      * @return CM_Site_Abstract
      * @throws CM_Exception_Nonexistent

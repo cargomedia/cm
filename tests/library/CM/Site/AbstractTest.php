@@ -63,14 +63,14 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testEquals() {
-        $siteFoo = $this->mockClass('CM_Site_Abstract');
+        $siteFoo = $this->mockClass(CM_Site_Abstract::class);
         $siteFoo->mockMethod('getUrlString')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteFoo1 */
         $siteFoo1 = $siteFoo->newInstance();
         /** @var CM_Site_Abstract $siteFoo2 */
         $siteFoo2 = $siteFoo->newInstance();
 
-        $siteBar = $this->mockClass('CM_Site_Abstract');
+        $siteBar = $this->mockClass(CM_Site_Abstract::class);
         $siteBar->mockMethod('getUrlString')->set('http://foo.com');
         /** @var CM_Site_Abstract $siteBar1 */
         $siteBar1 = $siteBar->newInstance();
@@ -87,7 +87,7 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
     }
 
     public function testEqualsDifferentUrl() {
-        $siteClass = $this->mockClass('CM_Site_Abstract');
+        $siteClass = $this->mockClass(CM_Site_Abstract::class);
 
         /** @var CM_Site_Abstract|\Mocka\AbstractClassTrait $site1 */
         $site1 = $siteClass->newInstance();
@@ -151,6 +151,15 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         });
         $this->assertInstanceOf(CM_Exception_Nonexistent::class, $exception);
         $this->assertSame('Site doesn\'t exist', $exception->getMessage());
+    }
+
+    public function testFactoryFromModelData() {
+        $mongoDb = $this->getServiceManager()->getMongoDb();
+        $defaultSite = (new CM_Site_SiteFactory())->getDefaultSite();
+        $id = $defaultSite->getId();
+        $modelData = $mongoDb->findOne(CM_Site_Abstract::getTableName(), ['_id' => CM_MongoDb_Client::getObjectId($id)]);
+        $createdSite = CM_Site_Abstract::factoryFromModelData($modelData);
+        $this->assertEquals($defaultSite, $createdSite);
     }
 
     public function testFactory() {
