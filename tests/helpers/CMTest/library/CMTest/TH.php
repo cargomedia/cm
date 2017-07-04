@@ -64,17 +64,6 @@ class CMTest_TH {
         return self::$_timeStart + self::$timeDelta;
     }
 
-    public static function gettimeofday($returnFloat = null) {
-        $pseudoTime = self::time();
-        if ($returnFloat) {
-            return $pseudoTime + 0.1234;
-        }
-        $dateStruct = gettimeofday();
-        $dateStruct['sec'] = $pseudoTime;
-        $dateStruct['usec'] = 123456;
-        return $dateStruct;
-    }
-
     public static function timeForward($sec) {
         self::$timeDelta += $sec;
         timecop_freeze(self::time());
