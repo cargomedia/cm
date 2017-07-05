@@ -59,14 +59,6 @@ abstract class CM_Cache_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string[] $keys
-     * @return mixed[]
-     */
-    public final function getMulti(array $keys) {
-        return $this->_getStorage()->getMulti($keys);
-    }
-
-    /**
      * @param string $key
      */
     public final function delete($key) {

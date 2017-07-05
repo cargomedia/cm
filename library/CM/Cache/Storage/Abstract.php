@@ -72,28 +72,6 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
     }
 
     /**
-     * @param string[] $keys
-     * @return mixed[]
-     */
-    public final function getMulti(array $keys) {
-        CM_Service_Manager::getInstance()->getDebug()->incStats(strtolower($this->_getName()) . '-getMulti', $keys);
-        foreach ($keys as &$key) {
-            $key = self::_getKeyArmored($key);
-        }
-        $values = $this->_getMulti($keys);
-        $result = array();
-        $runtime = $this->_getRuntime();
-        foreach ($values as $armoredKey => $value) {
-            $key = $this->_extractKeyArmored($armoredKey);
-            $result[$key] = $value;
-            if ($runtime) {
-                $runtime->set($key, $value);
-            }
-        }
-        return $result;
-    }
-
-    /**
      * @return string
      */
     abstract protected function _getName();
@@ -124,39 +102,11 @@ abstract class CM_Cache_Storage_Abstract extends CM_Class_Abstract {
     abstract protected function _flush();
 
     /**
-     * @param string[] $keys
-     * @return mixed[]
-     */
-    protected function _getMulti(array $keys) {
-        $values = array();
-        foreach ($keys as $key) {
-            $value = $this->_get($key);
-            if (false !== $value) {
-                $values[$key] = $value;
-            }
-        }
-        return $values;
-    }
-
-    /**
      * @param string $key
      * @return string
      */
     protected function _getKeyArmored($key) {
         return CM_Bootloader::getInstance()->getDataPrefix() . DIR_ROOT . '_' . $key;
-    }
-
-    /**
-     * @param string $keyArmored
-     * @return string mixed
-     * @throws CM_Exception_Invalid
-     */
-    protected static final function _extractKeyArmored($keyArmored) {
-        $prefix = CM_Bootloader::getInstance()->getDataPrefix() . DIR_ROOT;
-        if (!preg_match('/^' . preg_quote($prefix, '/') . '_' . '(.+)$/', $keyArmored, $matches)) {
-            throw new CM_Exception_Invalid('Cannot extract key from keyArmored', null, ['keyArmored' => $keyArmored]);
-        }
-        return $matches[1];
     }
 
     /**
