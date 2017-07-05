@@ -1,6 +1,6 @@
 <?php
 
-class CMTest_SplittedUnitTest {
+class CMTest_SplitUnitTestLoader {
 
     public static function suite($suiteClassName) {
         $matches = [];
