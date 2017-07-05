@@ -26,31 +26,6 @@ class CM_Model_StorageAdapter_MongoDb extends CM_Model_StorageAdapter_AbstractAd
         return $data;
     }
 
-    public function loadMultiple(array $idTypeList) {
-        $idListByCollection = [];
-        $keyListById = [];
-        $mongoDb = $this->_getMongoDb();
-
-        foreach ($idTypeList as $key => $idType) {
-            $type = (int) $idType['type'];
-            $id = (string) $idType['id']['id'];
-            $collectionName = $this->_getCollectionName($type);
-            $idListByCollection[$collectionName][] = CM_MongoDb_Client::getObjectId($id);
-            $keyListById[$id][] = $key;
-        }
-        $resultSet = [];
-        foreach ($idListByCollection as $collectionName => $idList) {
-            $result = $mongoDb->find($collectionName, ['_id' => ['$in' => $idList]]);
-            foreach ($result as $row) {
-                $id = (string) $row['_id'];
-                foreach ($keyListById[$id] as $key) {
-                    $resultSet[$key] = $row;
-                }
-            }
-        }
-        return $resultSet;
-    }
-
     public function save($type, array $id, array $data) {
         $type = (int) $type;
         $id = (string) $id['id'];

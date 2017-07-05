@@ -95,40 +95,6 @@ class CM_Model_StorageAdapter_MongoDbTest extends CMTest_TestCase {
         $this->assertSame(1, CMTest_TH::getMongoDb()->count('mock_modelStorageAdapter', ['foo' => 'foo2', 'bar' => 2]));
     }
 
-    public function testLoadMultiple() {
-        $type = 99;
-        $adapter = $this->_getAdapter();
-        $id1 = $adapter->create($type, ['foo' => 'foo1', 'bar' => 1]);
-        $id2 = $adapter->create($type, ['foo' => 'foo2', 'bar' => 2]);
-        $id3 = $adapter->create($type, ['foo' => 'foo3', 'bar' => 3]);
-        $id4 = $adapter->create($type, ['foo' => 'foo4', 'bar' => 4]);
-        $id5 = $adapter->create($type, ['foo' => 'foo5', 'bar' => 5]);
-        $id6 = $adapter->create($type, ['foo' => 'foo6', 'bar' => 6]);
-        $id7 = $adapter->create($type, ['foo' => 'foo7', 'bar' => 7]);
-        $id8 = $adapter->create($type, ['foo' => 'foo8', 'bar' => 8]);
-        $id9 = $adapter->create($type, ['foo' => 'foo9', 'bar' => 9]);
-        $id10 = $adapter->create($type, ['foo' => 'foo10', 'bar' => 10]);
-
-        $idsTypes = [
-            1      => ['type' => $type, 'id' => $id1],
-            '2'    => ['type' => $type, 'id' => $id3],
-            'foo'  => ['type' => $type, 'id' => $id10],
-            'bar'  => ['type' => $type, 'id' => $id8],
-            'foo2' => ['type' => $type, 'id' => $id10],
-        ];
-        $expected = [
-            1      => ['_id' => $id1['id'], '_type' => $type, 'foo' => 'foo1', 'bar' => 1],
-            '2'    => ['_id' => $id3['id'], '_type' => $type, 'foo' => 'foo3', 'bar' => 3],
-            'bar'  => ['_id' => $id8['id'], '_type' => $type, 'foo' => 'foo8', 'bar' => 8],
-            'foo'  => ['_id' => $id10['id'], '_type' => $type, 'foo' => 'foo10', 'bar' => 10],
-            'foo2' => ['_id' => $id10['id'], '_type' => $type, 'foo' => 'foo10', 'bar' => 10],
-        ];
-
-        $values = $adapter->loadMultiple($idsTypes);
-        $this->assertSame(5, count($values));
-        $this->assertEquals($expected, $values);
-    }
-
     public function testFindByData() {
         $type = 99;
         $adapter = $this->_getAdapter();

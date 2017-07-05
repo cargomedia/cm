@@ -30,8 +30,4 @@ class CM_Cache_Storage_Memcache extends CM_Cache_Storage_Abstract {
     protected function _flush() {
         $this->_client->flush();
     }
-
-    protected function _getMulti(array $keys) {
-        return $this->_client->get($keys);
-    }
 }

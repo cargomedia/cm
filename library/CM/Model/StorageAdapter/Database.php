@@ -6,41 +6,6 @@ class CM_Model_StorageAdapter_Database extends CM_Model_StorageAdapter_AbstractA
         return CM_Db_Db::select($this->_getTableName($type), '*', $id)->fetch();
     }
 
-    public function loadMultiple(array $idTypeList) {
-        $idListByTable = [];
-        $keyListById = [];
-
-        foreach ($idTypeList as $key => $idType) {
-            $type = (int) $idType['type'];
-            $id = $idType['id'];
-            $tableName = $this->_getTableName($type);
-            $idListByTable[$tableName][] = $id;
-            foreach ($id as &$idPart) {
-                $idPart = (string) $idPart;
-            }
-            $idSerialized = 'table:' . $tableName . ';id:' . serialize($id);
-            $keyListById[$idSerialized][] = $key;
-        }
-        $resultSet = [];
-        foreach ($idListByTable as $tableName => $idList) {
-            $idColumnList = array_keys($idList[0]);
-            $result = CM_Db_Db::selectMultiple($tableName, '*', $idList)->fetchAll();
-            foreach ($result as $row) {
-                $id = [];
-                foreach ($idColumnList as $idColumn) {
-                    $id[$idColumn] = $row[$idColumn];
-                }
-                $idSerialized = 'table:' . $tableName . ';id:' . serialize($id);
-                if (isset($keyListById[$idSerialized])) {
-                    foreach ($keyListById[$idSerialized] as $key) {
-                        $resultSet[$key] = $row;
-                    }
-                }
-            }
-        }
-        return $resultSet;
-    }
-
     public function save($type, array $id, array $data) {
         CM_Db_Db::update($this->_getTableName($type), $data, $id);
     }
