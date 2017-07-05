@@ -4,7 +4,7 @@ class CMTest_SplitUnitTestLoader {
 
     public static function suite($suiteClassName) {
         $matches = [];
-        $range = getenv('PHPUNIT_TEST_RANGE') ?: '';
+        $range = getenv('PHPUNIT_TEST_RANGE') ?: '1/1';
         if (preg_match('/(?P<chunk>\d+)\/(?P<parts>\d+)/', $range, $matches)) {
             $chunk = (int) $matches['chunk'] - 1;
             $parts = (int) $matches['parts'];
