@@ -168,4 +168,20 @@ class CM_Site_AbstractTest extends CMTest_TestCase {
         $this->assertInstanceOf(CM_Site_Abstract::class, $site);
         $this->assertEquals($siteMock, $site);
     }
+
+    public function testCacheInvalidation() {
+        $defaultSite = (new CM_Site_SiteFactory())->getDefaultSite();
+        $siteList = (new CM_Paging_Site_All())->getItems();
+        $siteEmailList = \Functional\map($siteList, function (CM_Site_Abstract $site) {
+            return $site->getEmailAddress();
+        });
+        $this->assertEquals(['default@default.dev','foo@foo.com'], $siteEmailList);
+        $defaultSite->setEmailAddress('changed@example.com');
+
+        $siteList = (new CM_Paging_Site_All())->getItems();
+        $siteEmailList = \Functional\map($siteList, function (CM_Site_Abstract $site) {
+            return $site->getEmailAddress();
+        });
+        $this->assertEquals(['changed@example.com','foo@foo.com'], $siteEmailList);
+    }
 }

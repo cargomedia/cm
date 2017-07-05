@@ -39,6 +39,8 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
         if (null === $id && null === $data) {
             $data = array();
             $this->_autoCommit = false;
+        } else {
+            $this->_autoCommit = true;
         }
         if (null !== $id) {
             $this->_id = self::_castIdRaw($id);

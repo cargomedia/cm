@@ -326,6 +326,10 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         return [new CM_Paging_Site_All()];
     }
 
+    protected function _onChange() {
+        $this->_changeContainingCacheables();
+    }
+
     /**
      * @param string $id
      * @param int    $type
