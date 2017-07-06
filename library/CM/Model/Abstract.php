@@ -33,9 +33,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     /**
      * @param array|null $id
      * @param array|null $data
-     * @throws CM_Exception_Invalid
+     * @param bool|null  $skipDataValidation
      */
-    final protected function _construct(array $id = null, array $data = null) {
+    final protected function _construct(array $id = null, array $data = null, $skipDataValidation = null) {
         if (null === $id && null === $data) {
             $data = array();
             $this->_autoCommit = false;
@@ -46,7 +46,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
             $this->_id = self::_castIdRaw($id);
         }
         if (null !== $data) {
-            $this->_setData($data);
+            $this->_setData($data, $skipDataValidation);
         }
         foreach ($this->_getAssets() as $asset) {
             $this->_assets = array_merge($this->_assets, array_fill_keys($asset->getClassHierarchy(), $asset));
@@ -332,10 +332,13 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     /**
-     * @param array $data
+     * @param array     $data
+     * @param bool|null $skipDataValidation
      */
-    protected function _setData(array $data) {
-        $this->_validateFields($data);
+    protected function _setData(array $data, $skipDataValidation = null) {
+        if ($skipDataValidation !== true) {
+            $this->_validateFields($data);
+        }
         $this->_data = $data;
     }
 
