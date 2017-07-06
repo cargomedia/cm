@@ -336,7 +336,7 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
      * @param bool|null $skipDataValidation
      */
     protected function _setData(array $data, $skipDataValidation = null) {
-        if ($skipDataValidation !== true) {
+        if (true !== $skipDataValidation) {
             $this->_validateFields($data);
         }
         $this->_data = $data;
