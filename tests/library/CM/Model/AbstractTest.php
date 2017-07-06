@@ -109,9 +109,9 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
     }
 
     public function testSetDataValidatesFields() {
-        $data = array('foo' => 12, 'bar' => 23);
+        $data = ['foo' => 12, 'bar' => 23];
 
-        $modelMock = $this->mockObject('CM_Model_Abstract');
+        $modelMock = $this->mockObject(CM_Model_Abstract::class);
         $methodValidateFields = $modelMock->mockMethod('_validateFields');
         $methodValidateFields->set(function ($dataActual) use ($data) {
             $this->assertEquals($dataActual, $data);
@@ -119,6 +119,16 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
 
         $this->forceInvokeMethod($modelMock, '_setData', [$data]);
         $this->assertSame(1, $methodValidateFields->getCallCount());
+    }
+
+    public function testSetDataNonValidatesFields() {
+        $data = ['foo' => 12, 'bar' => 23];
+
+        $modelMock = $this->mockObject(CM_Model_Abstract::class);
+        $methodValidateFields = $modelMock->mockMethod('_validateFields');
+
+        $this->forceInvokeMethod($modelMock, '_setData', [$data, true]);
+        $this->assertSame(0, $methodValidateFields->getCallCount());
     }
 
     public function testCreateValidatesFields() {
@@ -1092,21 +1102,21 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->mockMethod('getType')->set(1);
         $model->mockMethod('_validateFields');
         $model->mockMethod('_getData')->set([]);
-        
+
         $persistence = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
         $persistence->mockMethod('create')->set([]);
         $persistenceDelete = $persistence->mockMethod('delete');
         $model->mockMethod('_getPersistence')->set($persistence);
-        
+
         $cache = $this->mockObject(CM_Model_StorageAdapter_AbstractAdapter::class);
         $cacheDelete = $cache->mockMethod('delete');
         $model->mockMethod('_getCache')->set($cache);
-        
+
         $exception = new Exception('Cannot perform on create callback');
         $model->mockMethod('_onCreate')->set(function() use ($exception) {
             throw $exception;
         });
-        
+
         try {
             /** @var CM_Model_Abstract $model */
             $model->commit();

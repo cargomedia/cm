@@ -354,7 +354,7 @@ abstract class CM_Site_Abstract extends CM_Model_Abstract {
         unset($modelData['_type']);
         /** @var static $model */
         $model = new $className();
-        $model->_construct(['id' => $id[0]], $modelData);
+        $model->_construct(['id' => $id[0]], $modelData, true);
         return $model;
     }
 
