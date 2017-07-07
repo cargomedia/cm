@@ -270,23 +270,6 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
-    public function testDecodeArrayConvertibleFailed() {
-        $object = $this->mockInterface('CM_ArrayConvertible');
-        $fromArrayMethod = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
-            throw new CM_ArrayConvertible_MalformedArrayException();
-        });
-        $encodedArrayConvertible = [
-            '_class' => get_class($object->newInstance()),
-        ];
-        $exception = $this->catchException(function () use ($encodedArrayConvertible) {
-            CM_Params::decode($encodedArrayConvertible);
-        });
-        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
-        $this->assertSame('fromArray conversion failed', $exception->getMessage());
-
-        $this->assertSame(1, $fromArrayMethod->getCallCount());
-    }
-
     public function testDecodeArrayConvertibleRecursive() {
         $objectOuter = $this->mockInterface('CM_ArrayConvertible');
         $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
@@ -624,6 +607,22 @@ class CM_ParamsTest extends CMTest_TestCase {
         $definition = new CM_StreamChannel_Definition('foo', 12);
         $params = new CM_Params(['def' => $definition], false);
         $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
+    }
+
+    public function testFailedDecoding() {
+        $objectClass = $this->mockInterface(CM_ArrayConvertible::class);
+        $object = $objectClass->newInstance();
+        $objectClass->mockStaticMethod('fromArray')->set(function () {
+            throw new CM_ArrayConvertible_MalformedArrayException();
+        });
+        $params = CM_Params::factory([
+            'key' => ['_class' => get_class($object)],
+        ], true);
+        $exception = $this->catchException(function () use ($params) {
+            $this->callProtectedMethod($params, '_get', ['key']);
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Params decoding failed', $exception->getMessage());
     }
 
     public function testGetGeometryVector2() {
