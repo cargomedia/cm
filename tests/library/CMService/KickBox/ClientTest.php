@@ -3,7 +3,7 @@
 class CMService_KickBox_ClientTest extends CMTest_TestCase {
 
     public function setUp() {
-        $this->_mockGetMXRecords(true);
+        $this->_mockHasMXRecords(true);
     }
 
     public function testMalformedEmailAddress() {
@@ -152,9 +152,9 @@ class CMService_KickBox_ClientTest extends CMTest_TestCase {
         return $kickBoxMock;
     }
 
-    protected function _mockGetMXRecords($value) {
+    protected function _mockHasMXRecords($value) {
         $networkToolsMockClass = $this->mockClass(CM_Service_NetworkTools::class)->newInstanceWithoutConstructor();
-        $networkToolsMockClass->mockMethod('getMXRecords')->set($value);
+        $networkToolsMockClass->mockMethod('hasMXRecords')->set($value);
         $this->getServiceManager()->replaceInstance('network-tools', $networkToolsMockClass);
     }
 }
