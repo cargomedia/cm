@@ -205,6 +205,11 @@ return function (CM_Config_Node $config) {
         'arguments' => [],
     ];
 
+    $config->services['network-tools'] = [
+        'class'     => CM_Service_NetworkTools::class,
+        'arguments' => [],
+    ];
+
     $config->services['memcache'] = [
         'class'     => CM_Memcache_Client::class,
         'arguments' => [
