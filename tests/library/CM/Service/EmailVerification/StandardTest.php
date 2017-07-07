@@ -9,21 +9,30 @@ class CM_Service_EmailVerification_StandardTest extends CMTest_TestCase {
 
     public function testMalformed() {
         $emailVerificationService = new CM_Service_EmailVerification_Standard();
-        $this->assertFalse($emailVerificationService->isValid('invalid email@google.com'));
+        $this->assertFalse($emailVerificationService->isValid('invalid email@example.com'));
     }
 
     public function testHostUnresolved() {
         $emailVerificationService = new CM_Service_EmailVerification_Standard();
-        $this->assertFalse($emailVerificationService->isValid('email@google.c'));
+        $this->_mockGetMXRecords(false);
+        $this->assertFalse($emailVerificationService->isValid('email@example.c'));
     }
 
     public function testMissingMX() {
         $emailVerificationService = new CM_Service_EmailVerification_Standard();
+        $this->_mockGetMXRecords(false);
         $this->assertFalse($emailVerificationService->isValid('email@example.com'));
     }
 
     public function testValid() {
         $emailVerificationService = new CM_Service_EmailVerification_Standard();
-        $this->assertTrue($emailVerificationService->isValid('email@google.com'));
+        $this->_mockGetMXRecords(true);
+        $this->assertTrue($emailVerificationService->isValid('email@example.com'));
+    }
+
+    protected function _mockGetMXRecords($value) {
+        $networkToolsMockClass = $this->mockClass(CM_Service_NetworkTools::class)->newInstanceWithoutConstructor();
+        $networkToolsMockClass->mockMethod('getMXRecords')->set($value);
+        $this->getServiceManager()->replaceInstance('network-tools', $networkToolsMockClass);
     }
 }
