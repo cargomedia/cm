@@ -1113,7 +1113,7 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
         $model->mockMethod('_getCache')->set($cache);
 
         $exception = new Exception('Cannot perform on create callback');
-        $model->mockMethod('_onCreate')->set(function() use ($exception) {
+        $model->mockMethod('_onCreate')->set(function () use ($exception) {
             throw $exception;
         });
 
@@ -1125,6 +1125,24 @@ class CM_Model_AbstractTest extends CMTest_TestCase {
             $this->assertSame(1, $persistenceDelete->getCallCount());
             $this->assertSame(1, $cacheDelete->getCallCount());
         }
+    }
+
+    public function testFromArray() {
+        CM_Config::get()->CM_Model_Abstract->types[CM_ModelMock::getTypeStatic()] = CM_ModelMock::class;
+        $modelMock = CM_ModelMock::createStatic(['foo' => 'bar5']);
+        $fromArray = CM_Model_Abstract::fromArray([
+            '_type' => CM_ModelMock::getTypeStatic(),
+            '_id'   => $modelMock->getIdRaw(),
+        ]);
+        $this->assertEquals($modelMock, $fromArray);
+
+        $exception = $this->catchException(function () {
+            CM_Model_Abstract::fromArray([
+                '_id' => [2],
+            ]);
+        });
+        $this->assertInstanceOf(CM_ArrayConvertible_MalformedArrayException::class, $exception);
+        $this->assertSame('Malformed array', $exception->getMessage());
     }
 }
 

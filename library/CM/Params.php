@@ -553,6 +553,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
      * @return mixed
      */
     protected function _get($key, $default = null) {
+        $key = (string) $key;
         if (!$this->has($key) && $default === null) {
             throw new CM_Exception_InvalidParam('Param not set', null, ['key' => $key]);
         }
@@ -561,7 +562,14 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         }
         $param = &$this->_params[$key];
         if (null === $param['decoded']) {
-            $param['decoded'] = self::decode($param['encoded']);
+            try {
+                $param['decoded'] = self::decode($param['encoded']);
+            } catch (CM_ArrayConvertible_MalformedArrayException $e) {
+                throw new CM_Exception_InvalidParam('Params decoding failed', null, [
+                    'key'          => $key,
+                    'encodedValue' => $param['encoded'],
+                ]);
+            }
         }
         return $param['decoded'];
     }
@@ -661,7 +669,7 @@ class CM_Params extends CM_Class_Abstract implements CM_Debug_DebugInfoInterface
         if ($json) {
             $value = CM_Util::jsonDecode($value);
         }
-        if (is_array($value) && isset($value['_class']) && is_subclass_of($value['_class'], 'CM_ArrayConvertible')) {
+        if (is_array($value) && isset($value['_class']) && is_subclass_of($value['_class'], CM_ArrayConvertible::class)) {
             $className = (string) $value['_class'];
             unset($value['_class']);
             if (!empty($value)) {

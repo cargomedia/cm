@@ -14,6 +14,7 @@ interface CM_ArrayConvertible {
      *
      * @param array $array
      * @return object
+     * @throws CM_ArrayConvertible_MalformedArrayException
      */
     public static function fromArray(array $array);
 }

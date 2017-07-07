@@ -609,6 +609,22 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertEquals($definition, $params->getStreamChannelDefinition('def'));
     }
 
+    public function testFailedDecoding() {
+        $objectClass = $this->mockInterface(CM_ArrayConvertible::class);
+        $object = $objectClass->newInstance();
+        $objectClass->mockStaticMethod('fromArray')->set(function () {
+            throw new CM_ArrayConvertible_MalformedArrayException();
+        });
+        $params = CM_Params::factory([
+            'key' => ['_class' => get_class($object)],
+        ], true);
+        $exception = $this->catchException(function () use ($params) {
+            $this->callProtectedMethod($params, '_get', ['key']);
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('Params decoding failed', $exception->getMessage());
+    }
+
     public function testGetGeometryVector2() {
         $vector2 = new CM_Geometry_Vector2(1.1, 2.2);
         $params = new CM_Params(array('vector2' => $vector2), false);

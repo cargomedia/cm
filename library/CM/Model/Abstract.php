@@ -641,6 +641,9 @@ abstract class CM_Model_Abstract extends CM_Class_Abstract
     }
 
     public static function fromArray(array $data) {
+        if (!array_key_exists('_type', $data) || !array_key_exists('_id', $data)) {
+            throw new CM_ArrayConvertible_MalformedArrayException('Malformed array');
+        }
         return self::factoryGeneric($data['_type'], $data['_id']);
     }
 }
