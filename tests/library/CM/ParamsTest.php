@@ -270,6 +270,23 @@ class CM_ParamsTest extends CMTest_TestCase {
         $this->assertSame(1, $fromArrayMethod->getCallCount());
     }
 
+    public function testDecodeArrayConvertibleFailed() {
+        $object = $this->mockInterface('CM_ArrayConvertible');
+        $fromArrayMethod = $object->mockStaticMethod('fromArray')->set(function ($encoded) {
+            throw new CM_ArrayConvertible_MalformedArrayException();
+        });
+        $encodedArrayConvertible = [
+            '_class' => get_class($object->newInstance()),
+        ];
+        $exception = $this->catchException(function () use ($encodedArrayConvertible) {
+            CM_Params::decode($encodedArrayConvertible);
+        });
+        $this->assertInstanceOf(CM_Exception_InvalidParam::class, $exception);
+        $this->assertSame('fromArray conversion failed', $exception->getMessage());
+
+        $this->assertSame(1, $fromArrayMethod->getCallCount());
+    }
+
     public function testDecodeArrayConvertibleRecursive() {
         $objectOuter = $this->mockInterface('CM_ArrayConvertible');
         $fromArrayMethodOuter = $objectOuter->mockStaticMethod('fromArray')->set(function ($encoded) {
