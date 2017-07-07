@@ -5,10 +5,11 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
     public function testValidate() {
         $field = new CM_FormField_Email(['name' => 'email']);
         $environment = new CM_Frontend_Environment();
-
-        $this->assertSame('test@google.com', $field->validate($environment, 'test@google.com'));
+        $this->_mockHasMXRecords(true);
+        $this->assertSame('test@example.com', $field->validate($environment, 'test@example.com'));
         try {
-            $field->validate($environment, 'test(at)google.com');
+            $this->_mockHasMXRecords(false);
+            $field->validate($environment, 'test(at)example.com');
             $this->fail('Invalid email address passed validation');
         } catch (CM_Exception_FormFieldValidation $e) {
             $this->assertTrue(true);
@@ -26,10 +27,17 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
         $serviceManager->registerInstance('email-verification', $emailVerificationMock);
         $field = new CM_FormField_Email(['name' => 'email', 'disable-email-verification' => true]);
         $environment = new CM_Frontend_Environment();
+        $this->_mockHasMXRecords(true);
 
-        $this->assertSame('test@google.com', $field->validate($environment, 'test@google.com'));
+        $this->assertSame('test@example.com', $field->validate($environment, 'test@example.com'));
 
         $serviceManager->unregister('email-verification');
         $serviceManager->registerInstance('email-verification', $emailVerificationDefault);
+    }
+
+    protected function _mockHasMXRecords($value) {
+        $networkToolsMockClass = $this->mockClass(CM_Service_NetworkTools::class)->newInstanceWithoutConstructor();
+        $networkToolsMockClass->mockMethod('hasMXRecords')->set($value);
+        $this->getServiceManager()->replaceInstance('network-tools', $networkToolsMockClass);
     }
 }
