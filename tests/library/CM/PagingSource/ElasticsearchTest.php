@@ -45,21 +45,21 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
         $id = $type1->createEntry('foo');
         $this->assertSame(1, $source->getCount());
-        $this->assertSame(array((string) $id), $source->getItems());
+        $this->assertSame([(string) $id], $source->getItems());
 
         $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
-        $source = new CM_PagingSource_Elasticsearch($type3, new CM_Elasticsearch_Query(), array('price'));
+        $source = new CM_PagingSource_Elasticsearch($type3, new CM_Elasticsearch_Query(), ['price']);
         $this->assertSame(0, $source->getCount());
 
         $id2 = $type3->createEntry(3);
         $this->assertSame(1, $source->getCount());
-        $this->assertSame(array(array('id' => (string) $id2, 'price' => 3)), $source->getItems());
+        $this->assertSame([['id' => (string) $id2, 'price' => 3]], $source->getItems());
     }
 
     public function testMultiGet() {
         $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
         $type2 = new CM_Elasticsearch_Type_Mock2($this->_elasticsearchClient);
-        $source = new CM_PagingSource_Elasticsearch(array($type1, $type2), new CM_Elasticsearch_Query());
+        $source = new CM_PagingSource_Elasticsearch([$type1, $type2], new CM_Elasticsearch_Query());
         $this->assertSame(0, $source->getCount());
 
         $id1 = $type1->createEntry('foo');
@@ -67,41 +67,41 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
 
         $id2 = $type2->createEntry(1);
         $this->assertSame(2, $source->getCount());
-        $this->assertContainsAll(array(
-            array('id' => (string) $id1, 'type' => 'index_1'),
-            array('id' => (string) $id2, 'type' => 'index_2')
-        ), $source->getItems());
+        $this->assertContainsAll([
+            ['id' => (string) $id1, 'type' => 'index_1'],
+            ['id' => (string) $id2, 'type' => 'index_2']
+        ], $source->getItems());
 
         $type3 = new CM_Elasticsearch_Type_Mock3($this->_elasticsearchClient);
-        $source = new CM_PagingSource_Elasticsearch(array($type1, $type2, $type3), new CM_Elasticsearch_Query(), array('price'));
+        $source = new CM_PagingSource_Elasticsearch([$type1, $type2, $type3], new CM_Elasticsearch_Query(), ['price']);
         $id3 = $type3->createEntry(5);
 
         $this->assertSame(3, $source->getCount());
-        $this->assertContainsAll(array(
-            array('id' => (string) $id1, 'type' => 'index_1'),
-            array('id' => (string) $id2, 'type' => 'index_2'),
-            array('id' => (string) $id3, 'type' => 'index_3', 'price' => 5)
-        ), $source->getItems());
+        $this->assertContainsAll([
+            ['id' => (string) $id1, 'type' => 'index_1'],
+            ['id' => (string) $id2, 'type' => 'index_2'],
+            ['id' => (string) $id3, 'type' => 'index_3', 'price' => 5]
+        ], $source->getItems());
     }
 }
 
 class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
 
-    protected $_mapping = array(
-        'name' => array('type' => 'string'),
-    );
+    protected $_mapping = [
+        'name' => ['type' => 'string'],
+    ];
 
-    protected $_indexParams = array(
+    protected $_indexParams = [
         'number_of_shards'   => 1,
         'number_of_replicas' => 0,
-    );
+    ];
 
     /**
      * @param string $name
      * @return int
      */
     public function createEntry($name) {
-        $id = CM_Db_Db::insert('indexTest_1', array('name' => (string) $name));
+        $id = CM_Db_Db::insert('indexTest_1', ['name' => (string) $name]);
         $this->updateDocuments($id);
         $this->refreshIndex();
         return (int) $id;
@@ -122,21 +122,21 @@ class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {
 
 class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
 
-    protected $_mapping = array(
-        'price' => array('type' => 'integer'),
-    );
+    protected $_mapping = [
+        'price' => ['type' => 'integer'],
+    ];
 
-    protected $_indexParams = array(
+    protected $_indexParams = [
         'number_of_shards'   => 1,
         'number_of_replicas' => 0,
-    );
+    ];
 
     /**
      * @param int $price
      * @return int
      */
     public function createEntry($price) {
-        $id = CM_Db_Db::insert('indexTest_2', array('price' => (int) $price));
+        $id = CM_Db_Db::insert('indexTest_2', ['price' => (int) $price]);
         $this->updateDocuments($id);
         $this->refreshIndex();
         return (int) $id;
@@ -157,21 +157,21 @@ class CM_Elasticsearch_Type_Mock2 extends CM_Elasticsearch_Type_Abstract {
 
 class CM_Elasticsearch_Type_Mock3 extends CM_Elasticsearch_Type_Abstract {
 
-    protected $_mapping = array(
-        'price' => array('type' => 'integer', 'store' => 'yes'),
-    );
+    protected $_mapping = [
+        'price' => ['type' => 'integer', 'store' => 'yes'],
+    ];
 
-    protected $_indexParams = array(
+    protected $_indexParams = [
         'number_of_shards'   => 1,
         'number_of_replicas' => 0,
-    );
+    ];
 
     /**
      * @param int $price
      * @return int
      */
     public function createEntry($price) {
-        $id = CM_Db_Db::insert('indexTest_3', array('price' => (int) $price));
+        $id = CM_Db_Db::insert('indexTest_3', ['price' => (int) $price]);
         $this->updateDocuments($id);
         $this->refreshIndex();
         return (int) $id;

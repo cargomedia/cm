@@ -2,9 +2,9 @@
 
 class CM_Elasticsearch_Query {
 
-    private $_queries = array();
-    private $_filters = array();
-    private $_sorts = array();
+    private $_queries = [];
+    private $_filters = [];
+    private $_sorts = [];
     private $_mode, $_filterMode;
 
     /**
@@ -34,7 +34,7 @@ class CM_Elasticsearch_Query {
      * @param string $value
      */
     public function queryField($field, $value) {
-        $this->_queries[] = array('field' => array($field => $value));
+        $this->_queries[] = ['field' => [$field => $value]];
     }
 
     /**
@@ -45,9 +45,9 @@ class CM_Elasticsearch_Query {
     public function queryMatch($field, $query, array $options = null) {
         $field = (string) $field;
         $query = (string) $query;
-        $data = array(
+        $data = [
             'query' => $query,
-        );
+        ];
         if (isset($options['operator'])) {
             $data['operator'] = (string) $options['operator'];
         }
@@ -57,7 +57,7 @@ class CM_Elasticsearch_Query {
         if (isset($options['analyzer'])) {
             $data['analyzer'] = (string) $options['analyzer'];
         }
-        $this->query(array('match' => array($field => $data)));
+        $this->query(['match' => [$field => $data]]);
     }
 
     /**
@@ -67,17 +67,17 @@ class CM_Elasticsearch_Query {
      * @param float|null  $fuzziness 0 - 1
      */
     public function queryMatchMulti($fields, $value, $operator = null, $fuzziness = null) {
-        $data = array(
+        $data = [
             'query'  => $value,
             'fields' => $fields,
-        );
+        ];
         if (null !== $operator) {
             $data['operator'] = (string) $operator;
         }
         if (null !== $fuzziness) {
             $data['fuzziness'] = (float) $fuzziness;
         }
-        $this->query(array('multi_match' => $data));
+        $this->query(['multi_match' => $data]);
     }
 
     /**
@@ -91,14 +91,14 @@ class CM_Elasticsearch_Query {
      * @param array $filter
      */
     protected function _filterNot(array $filter) {
-        $this->_filters[] = array('not' => array('filter' => $filter));
+        $this->_filters[] = ['not' => ['filter' => $filter]];
     }
 
     /**
      * @param string $field
      */
     public function filterExists($field) {
-        $this->_filter(array('exists' => array('field' => (string) $field)));
+        $this->_filter(['exists' => ['field' => (string) $field]]);
     }
 
     /**
@@ -106,7 +106,7 @@ class CM_Elasticsearch_Query {
      * @param string $value
      */
     public function filterPrefix($field, $value) {
-        $this->_filter(array('prefix' => array($field => $value)));
+        $this->_filter(['prefix' => [$field => $value]]);
     }
 
     /**
@@ -115,9 +115,9 @@ class CM_Elasticsearch_Query {
      */
     public function filterTerm($field, $value) {
         if (is_array($value)) {
-            $this->_filter(array('terms' => array($field => $value)));
+            $this->_filter(['terms' => [$field => $value]]);
         } else {
-            $this->_filter(array('term' => array($field => $value)));
+            $this->_filter(['term' => [$field => $value]]);
         }
     }
 
@@ -127,9 +127,9 @@ class CM_Elasticsearch_Query {
      */
     public function filterTermNot($field, $value) {
         if (is_array($value)) {
-            $this->_filterNot(array('terms' => array($field => $value)));
+            $this->_filterNot(['terms' => [$field => $value]]);
         } else {
-            $this->_filterNot(array('term' => array($field => $value)));
+            $this->_filterNot(['term' => [$field => $value]]);
         }
     }
 
@@ -141,7 +141,7 @@ class CM_Elasticsearch_Query {
      * @param bool|null $openIntervalTo
      */
     public function filterRange($field, $from = null, $to = null, $openIntervalFrom = null, $openIntervalTo = null) {
-        $range = array();
+        $range = [];
         if ($from !== null) {
             $operand = 'gte';
             if ($openIntervalFrom) {
@@ -157,7 +157,7 @@ class CM_Elasticsearch_Query {
             $range[$operand] = $to;
         }
         if (!empty($range)) {
-            $this->_filter(array('range' => array($field => $range)));
+            $this->_filter(['range' => [$field => $range]]);
         }
     }
 
@@ -165,7 +165,7 @@ class CM_Elasticsearch_Query {
      * @param string $field
      */
     public function filterMissing($field) {
-        $this->_filter(array('missing' => array('field' => (string) $field, 'existence' => true, 'null_value' => true)));
+        $this->_filter(['missing' => ['field' => (string) $field, 'existence' => true, 'null_value' => true]]);
     }
 
     /**
@@ -179,7 +179,7 @@ class CM_Elasticsearch_Query {
             return;
         }
         $distance = ($distance / 1000) . 'km';
-        $this->_filter(array('geo_distance' => array($field => $coordinates, 'distance' => $distance, 'distance_type' => 'plane',)));
+        $this->_filter(['geo_distance' => [$field => $coordinates, 'distance' => $distance, 'distance_type' => 'plane',]]);
     }
 
     /**
@@ -191,11 +191,11 @@ class CM_Elasticsearch_Query {
         if (!$coordinates) {
             return;
         }
-        $this->_sort(array('_geo_distance' => array($field => $coordinates)));
+        $this->_sort(['_geo_distance' => [$field => $coordinates]]);
     }
 
     public function sortScore() {
-        $this->_sort(array('_score' => 'desc'));
+        $this->_sort(['_score' => 'desc']);
     }
 
     /**
@@ -203,14 +203,14 @@ class CM_Elasticsearch_Query {
      */
     public function getQuery() {
         if (count($this->_queries) == 0) {
-            $query = array('match_all' => new stdClass());
+            $query = ['match_all' => new stdClass()];
         } elseif (count($this->_queries) == 1) {
             $query = reset($this->_queries);
         } else {
-            $query = array('bool' => array($this->_mode => $this->_queries));
+            $query = ['bool' => [$this->_mode => $this->_queries]];
         }
         if (!empty($this->_filters)) {
-            $query = array('filtered' => array('query' => $query, 'filter' => array($this->_filterMode => $this->_filters)));
+            $query = ['filtered' => ['query' => $query, 'filter' => [$this->_filterMode => $this->_filters]]];
         }
         return $query;
     }
@@ -229,7 +229,7 @@ class CM_Elasticsearch_Query {
      * @param array $sort
      */
     protected function _sort(array $sort) {
-        $sortNew = array();
+        $sortNew = [];
         foreach ($sort as $key => $value) {
             $key = (string) $key;
             if (null === $value) {
@@ -266,8 +266,8 @@ class CM_Elasticsearch_Query {
      * @param array  $chars OPTIONAL
      * @return string
      */
-    public static function escape($term, array $chars = array('\\', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?',
-        ':')) {
+    public static function escape($term, array $chars = ['\\', '+', '-', '&&', '||', '!', '(', ')', '{', '}', '[', ']', '^', '"', '~', '*', '?',
+        ':']) {
         foreach ($chars as $char) {
             $term = str_replace($char, '\\' . $char, $term);
         }
