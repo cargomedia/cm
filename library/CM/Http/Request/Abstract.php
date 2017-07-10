@@ -137,7 +137,8 @@ abstract class CM_Http_Request_Abstract {
      * @return string
      */
     public final function getPath() {
-        return $this->_path;
+        $path = preg_replace('/^\/{2,}$/', '/', $this->_path);
+        return $path;
     }
 
     /**
@@ -172,7 +173,7 @@ abstract class CM_Http_Request_Abstract {
      */
     public function getPathParts() {
         if ($this->_pathParts === null) {
-            $this->_pathParts = explode('/', $this->_path);
+            $this->_pathParts = explode('/', $this->getPath());
             array_shift($this->_pathParts);
         }
         return $this->_pathParts;
