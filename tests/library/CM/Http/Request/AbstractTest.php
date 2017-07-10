@@ -175,6 +175,15 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $this->assertSame(array('foo1' => 'bar1:80'), $mock->getQuery());
     }
 
+    public function testGetPath() {
+        /** @var CM_Http_Request_Abstract|\Mocka\AbstractClassTrait $mock */
+        $mock = $this->mockClass('CM_Http_Request_Abstract')->newInstanceWithoutConstructor();
+        $mock->setPath('//');
+        $this->assertSame('/', $mock->getPath());
+        $mock->setPath('///');
+        $this->assertSame('/', $mock->getPath());
+    }
+
     public function testGetUri() {
         $request = $this->getMockForAbstractClass('CM_Http_Request_Abstract', array('/foo/bar?hello=world'));
         /** @var CM_Http_Request_Abstract $request */
