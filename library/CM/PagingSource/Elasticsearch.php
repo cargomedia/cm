@@ -48,7 +48,11 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
             $keyParts[] = $type->getIndexName() . '_' . $type->getIndexName();
         }
         sort($keyParts);
-        return [implode(',', $keyParts), $this->_query->getQuery()];
+        $cacheKeyBase = [implode(',', $keyParts), $this->_query->getQuery()];
+        if (null !== $this->_query->getMinScore()) {
+            $cacheKeyBase[] = $this->_query->getMinScore();
+        }
+        return $cacheKeyBase;
     }
 
     /**
@@ -60,6 +64,9 @@ class CM_PagingSource_Elasticsearch extends CM_PagingSource_Abstract {
         $cacheKey = [$this->_query->getSort(), $offset, $count];
         if (($result = $this->_cacheGet($cacheKey)) === false) {
             $data = ['query' => $this->_query->getQuery(), 'sort' => $this->_query->getSort()];
+            if (null !== $this->_query->getMinScore()) {
+                $data['min_score'] = $this->_query->getMinScore();
+            }
             if ($this->_fields) {
                 $data['fields'] = $this->_fields;
             }

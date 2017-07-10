@@ -83,6 +83,35 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
             ['id' => (string) $id3, 'type' => 'index_3', 'price' => 5]
         ], $source->getItems());
     }
+
+    public function testSelectRandomSubset() {
+        $type1 = new CM_Elasticsearch_Type_Mock1($this->_elasticsearchClient);
+        $query = new CM_Elasticsearch_Query();
+        $source = new CM_PagingSource_Elasticsearch($type1, $query);
+        $type1->createEntry('foo');
+        $type1->createEntry('bar');
+        $type1->createEntry('zoo');
+        $query->selectRandomSubset(100, mt_rand());
+        $this->assertSame(3, $source->getCount());
+
+        $query->selectRandomSubset(0, mt_rand());
+        $this->assertSame(0, $source->getCount());
+        $this->assertSame([], $source->getItems());
+
+        foreach ([90, 50, 10, 1] as $percentage) {
+            $count = 0;
+            $n = 400;
+            for ($i = 0; $i < $n; $i++) {
+                $query->selectRandomSubset($percentage, mt_rand());
+                $count += $source->getCount();
+            }
+            $countExpected = 3 * $percentage / 100 * $n;
+            $countExpectedMin = $countExpected - 5 * sqrt($countExpected);
+            $countExpectedMax = $countExpected + 5 * sqrt($countExpected);
+            $this->assertGreaterThan($countExpectedMin, $count);
+            $this->assertLessThan($countExpectedMax, $count);
+        }
+    }
 }
 
 class CM_Elasticsearch_Type_Mock1 extends CM_Elasticsearch_Type_Abstract {

@@ -7,6 +7,12 @@ class CM_Elasticsearch_Query {
     private $_sorts = [];
     private $_mode, $_filterMode;
 
+    /** @var float|null */
+    private $_minScore;
+
+    /** @var int|null */
+    private $_randomScoreSeed;
+
     /**
      * @param string|null $mode       must,must_not,should
      * @param string|null $filterMode or, and, not
@@ -183,6 +189,24 @@ class CM_Elasticsearch_Query {
     }
 
     /**
+     * @return float|null
+     */
+    public function getMinScore() {
+        return $this->_minScore;
+    }
+
+    /**
+     * @param float $percentage
+     * @param int   $seed
+     */
+    public function selectRandomSubset($percentage, $seed) {
+        $percentage = (float) $percentage;
+        $seed = (int) $seed;
+        $this->_minScore = (float) (1 << 24) * (1 - $percentage / 100);
+        $this->_randomScoreSeed = (int) $seed;
+    }
+
+    /**
      * @param string            $field
      * @param CM_Model_Location $location
      */
@@ -211,6 +235,13 @@ class CM_Elasticsearch_Query {
         }
         if (!empty($this->_filters)) {
             $query = ['filtered' => ['query' => $query, 'filter' => [$this->_filterMode => $this->_filters]]];
+        }
+        if (isset($this->_randomScoreSeed)) {
+            $query = ['function_score' => [
+                'random_score' => ['seed' => $this->_randomScoreSeed],
+                'filter'       => ['query' => $query],
+                'boost_mode'   => 'replace',
+            ]];
         }
         return $query;
     }
