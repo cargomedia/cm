@@ -196,11 +196,14 @@ class CM_Elasticsearch_Query {
     }
 
     /**
-     * @param float $percentage
-     * @param int   $seed
+     * @param float    $percentage
+     * @param int|null $seed
      */
-    public function selectRandomSubset($percentage, $seed) {
+    public function selectRandomSubset($percentage, $seed = null) {
         $percentage = (float) $percentage;
+        if (null === $seed) {
+            $seed = mt_rand();
+        }
         $seed = (int) $seed;
         $this->_minScore = (float) (1 << 24) * (1 - $percentage / 100);
         $this->_randomScoreSeed = (int) $seed;

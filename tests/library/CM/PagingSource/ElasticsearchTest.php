@@ -91,10 +91,10 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
         $type1->createEntry('foo');
         $type1->createEntry('bar');
         $type1->createEntry('zoo');
-        $query->selectRandomSubset(100, mt_rand());
+        $query->selectRandomSubset(100);
         $this->assertSame(3, $source->getCount());
 
-        $query->selectRandomSubset(0, mt_rand());
+        $query->selectRandomSubset(0);
         $this->assertSame(0, $source->getCount());
         $this->assertSame([], $source->getItems());
 
@@ -102,12 +102,12 @@ class CM_PagingSource_ElasticsearchTest extends CMTest_TestCase {
             $count = 0;
             $n = 400;
             for ($i = 0; $i < $n; $i++) {
-                $query->selectRandomSubset($percentage, mt_rand());
+                $query->selectRandomSubset($percentage);
                 $count += $source->getCount();
             }
             $countExpected = 3 * $percentage / 100 * $n;
-            $countExpectedMin = $countExpected - 5 * sqrt($countExpected);
-            $countExpectedMax = $countExpected + 5 * sqrt($countExpected);
+            $countExpectedMin = $countExpected - 5 * sqrt($countExpected * (1 - $percentage / 100));
+            $countExpectedMax = $countExpected + 5 * sqrt($countExpected * (1 - $percentage / 100));
             $this->assertGreaterThan($countExpectedMin, $count);
             $this->assertLessThan($countExpectedMax, $count);
         }
