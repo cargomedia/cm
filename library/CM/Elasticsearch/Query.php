@@ -205,7 +205,7 @@ class CM_Elasticsearch_Query {
             $seed = mt_rand();
         }
         $seed = (int) $seed;
-        $this->_minScore = (float) (1 << 24) * (1 - $percentage / 100);
+        $this->_minScore = 1 - $percentage / 100;
         $this->_randomScoreSeed = (int) $seed;
     }
 
