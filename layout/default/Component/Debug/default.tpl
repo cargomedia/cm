@@ -11,7 +11,7 @@
         <label for="{$name}">{$name}</label>
       </p>
     {/foreach}
-    {button_link class="clearCache" label="{translate 'Clear Cache'}"}
+    {button_link class="clearCache" label="{translate 'Clear Cache'}" title="{translate 'Click here or use [c] key'}"}
   </div>
 
   {foreach $stats as $name => $value}
