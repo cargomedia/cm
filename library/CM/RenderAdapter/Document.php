@@ -61,7 +61,7 @@ class CM_RenderAdapter_Document extends CM_RenderAdapter_Abstract {
             $frontend->getOnloadHeaderJs()->append('cm.viewer = ' . CM_Params::encode($viewer, true));
         }
 
-        $frontend->getOnloadReadyJs()->append('cm.getLayout()._ready();');
+        $frontend->getOnloadReadyJs()->append('cm.getDocument()._ready();');
         $frontend->getOnloadHeaderJs()->append('cm.ready();');
         $html = $render->fetchViewResponse($viewResponse);
 
