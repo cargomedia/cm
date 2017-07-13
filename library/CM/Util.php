@@ -593,6 +593,14 @@ class CM_Util {
     }
 
     /**
+     * @param array $array
+     * @return mixed
+     */
+    public static function arrayToObjectRecursive(array $array) {
+        return self::jsonDecode(self::jsonEncode($array), true);
+    }
+
+    /**
      * @param string $value
      * @return string
      */
