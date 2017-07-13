@@ -151,6 +151,23 @@ class CM_UtilTest extends CMTest_TestCase {
         CM_Util::jsonDecode('{[foo:bar)}');
     }
 
+    public function testJsonDecode() {
+        $this->assertSame([
+            'foo' => 'bar',
+            'baz' => 1,
+        ], CM_Util::jsonDecode('{"foo" : "bar", "baz" : 1}'));
+
+        $this->assertSame([
+            'foo' => 'bar',
+            'baz' => 1,
+        ], CM_Util::jsonDecode('{"foo" : "bar", "baz" : 1}', false));
+
+        $this->assertEquals((object) [
+            'foo' => 'bar',
+            'baz' => 1,
+        ], CM_Util::jsonDecode('{"foo" : "bar", "baz" : 1}', true));
+    }
+
     public function testSanitizeUtf() {
         $string = pack("H*", 'c32e');
         $this->assertSame('?.', CM_Util::sanitizeUtf($string));

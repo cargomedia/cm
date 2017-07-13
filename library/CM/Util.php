@@ -99,7 +99,7 @@ class CM_Util {
      * @param array|null   $params
      * @param boolean|null $methodPost
      * @param int|null     $timeout
-     * @param array|null   $header
+     * @param array|null   $headers
      * @throws CM_Exception_Invalid
      * @return string
      */
@@ -566,16 +566,17 @@ class CM_Util {
     }
 
     /**
-     * @param string $value
+     * @param string       $value
+     * @param boolean|null $formatAsObject
      * @return mixed
      * @throws CM_Exception_Invalid
      */
-    public static function jsonDecode($value) {
+    public static function jsonDecode($value, $formatAsObject = null) {
         $valueString = (string) $value;
         $result = '';
         $errorMessage = null;
         try {
-            $result = json_decode($valueString, true);
+            $result = json_decode($valueString, true === $formatAsObject ? false : true);
         } catch (ErrorException $e) {
             $errorMessage = $e->getMessage();
         }
