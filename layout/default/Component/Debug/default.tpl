@@ -6,12 +6,9 @@
 
   <div class="window actions">
     {foreach $cacheNames as $name}
-      <p>
-        <input class="{$name}" type="checkbox" name="{$name}" checked />
-        <label for="{$name}">{$name}</label>
-      </p>
+      <p>{checkbox class=$name label=$name checked=true}</p>
     {/foreach}
-    {button_link class="clearCache" label="{translate 'Clear Cache'}"}
+    {button_link class="clearCache" label="{translate 'Clear Cache'}" title="{translate 'Click here or use [c] key'}"}
   </div>
 
   {foreach $stats as $name => $value}
