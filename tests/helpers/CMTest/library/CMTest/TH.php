@@ -30,6 +30,7 @@ class CMTest_TH {
         self::clearCache();
         self::timeReset();
         self::clearFilesystem();
+        self::clearRequestInstance();
     }
 
     public static function clearCache() {
@@ -48,6 +49,10 @@ class CMTest_TH {
 
     public static function clearServices() {
         CM_Service_Manager::setInstance(clone self::$_serviceManagerBackup);
+    }
+
+    public static function clearRequestInstance() {
+        CM_Http_Request_Abstract::clearInstance();
     }
 
     public static function timeInit() {

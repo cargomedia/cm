@@ -671,6 +671,10 @@ abstract class CM_Http_Request_Abstract {
         return self::$_instance;
     }
 
+    public static function clearInstance() {
+        self::$_instance = null;
+    }
+
     /**
      * @param string      $method
      * @param string      $uri
