@@ -415,6 +415,19 @@ class CM_Http_Request_AbstractTest extends CMTest_TestCase {
         $request->popPathPrefix('/foo');
     }
 
+    public function testClearInstance() {
+        $this->assertFalse(CM_Http_Request_Abstract::hasInstance());
+
+        $request = new CM_Http_Request_Get('/');
+
+        $this->assertTrue(CM_Http_Request_Abstract::hasInstance());
+        $this->assertSame($request, CM_Http_Request_Abstract::getInstance());
+
+        CM_Http_Request_Abstract::clearInstance();
+
+        $this->assertFalse(CM_Http_Request_Abstract::hasInstance());
+    }
+
     /**
      * @param string             $uri
      * @param array|null         $additionalHeaders
