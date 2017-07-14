@@ -28,7 +28,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
     private function _dbToFileMongo($namespace) {
         $mongo = CM_Service_Manager::getInstance()->getMongoDb();
         $collectionList = \Functional\select($mongo->listCollectionNames(), function ($collection) use ($namespace) {
-            return preg_match('/^' . strtolower($namespace) . '_/', $collection);
+            return preg_match('/^' . strtolower($namespace) . '/', $collection);
         });
         sort($collectionList);
         $indexes = [];
@@ -63,7 +63,7 @@ class CM_Db_Cli extends CM_Cli_Runnable_Abstract {
      */
     private function _dbToFileSql($namespace) {
         $namespace = (string) $namespace;
-        $tables = CM_Db_Db::exec("SHOW TABLES LIKE ?", array(strtolower($namespace) . '_%'))->fetchAllColumn();
+        $tables = CM_Db_Db::exec("SHOW TABLES LIKE ?", array(strtolower($namespace) . '%'))->fetchAllColumn();
         sort($tables);
         $dump = CM_Db_Db::getDump($tables, true);
         CM_File::create(CM_Util::getModulePath($namespace) . '/resources/db/structure.sql', $dump);
