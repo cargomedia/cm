@@ -5,16 +5,11 @@ class CM_Elasticsearch_Client {
     /** @var Elasticsearch\Client */
     protected $_client;
 
-    /** @var CM_Debug|null */
-    private $_debug;
-
     /**
      * @param \Elasticsearch\Client $client
-     * @param CM_Debug|null         $debug
      */
-    public function __construct(Elasticsearch\Client $client, CM_Debug $debug = null) {
+    public function __construct(Elasticsearch\Client $client) {
         $this->_client = $client;
-        $this->_debug = $debug;
     }
 
     /**
@@ -239,7 +234,7 @@ class CM_Elasticsearch_Client {
             'index' => $paramIndex,
             'body'  => [
                 'settings' => $settings,
-            ],
+            ]
         ]);
     }
 
@@ -269,16 +264,12 @@ class CM_Elasticsearch_Client {
             'type'  => self::_prepareIndexNameParam($typeNameList),
             'body'  => $data,
         ];
-
-        if ($debug = $this->_getDebug()) {
-            $debug->incStats('search', json_encode($params));
-        }
         return $this->_getClient()->search($params);
     }
 
     public function awaitReady() {
         $this->_client->cluster()->health([
-            'wait_for_status' => 'yellow',
+            'wait_for_status' => 'yellow'
         ]);
     }
 
@@ -304,7 +295,7 @@ class CM_Elasticsearch_Client {
 
             throw new CM_Exception_Invalid('Error(s) in bulk request action(s)', null, [
                 'errorsCount' => count($response['items']),
-                'message'     => $message,
+                'message'     => $message
             ]);
         }
     }
@@ -321,13 +312,6 @@ class CM_Elasticsearch_Client {
      */
     protected function _getIndices() {
         return $this->_client->indices();
-    }
-
-    /**
-     * @return CM_Debug|null
-     */
-    protected function _getDebug() {
-        return $this->_debug;
     }
 
     /**
