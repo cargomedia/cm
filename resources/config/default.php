@@ -235,10 +235,13 @@ return function (CM_Config_Node $config) {
     ];
 
     $config->services['elasticsearch'] = [
-        'class'     => CM_Elasticsearch_Cluster::class,
-        'arguments' => [
-            'servers' => [
-                ['host' => 'localhost', 'port' => 9200],
+        'class'     => CM_Elasticsearch_Factory::class,
+        'method' => [
+            'name' => 'createCluster',
+            'arguments' => [
+                'servers' => [
+                    ['host' => 'localhost', 'port' => 9200],
+                ],
             ],
         ],
     ];
