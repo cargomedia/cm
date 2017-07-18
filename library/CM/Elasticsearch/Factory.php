@@ -20,7 +20,7 @@ class CM_Elasticsearch_Factory implements CM_Service_ManagerAwareInterface {
      * @param CM_Debug|null $debug
      * @return CM_Elasticsearch_Client
      */
-    public function createClient(array $servers, $debug = null) {
+    public function createClient(array $servers, CM_Debug $debug = null) {
         $vendorClient = $this->_createVendorClient($servers);
         return new CM_Elasticsearch_Client($vendorClient, $debug);
     }
@@ -37,5 +37,4 @@ class CM_Elasticsearch_Factory implements CM_Service_ManagerAwareInterface {
         //By default it uses RoundRobinSelector and number of retries equals to nodes quantity
         return \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
     }
-
 }

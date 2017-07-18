@@ -271,7 +271,7 @@ class CM_Elasticsearch_Client {
         ];
 
         if ($debug = $this->_getDebug()) {
-            $debug->incStats('search', json_encode($params));
+            $debug->incStats('search', CM_Util::jsonEncode($params));
         }
         return $this->_getClient()->search($params);
     }
