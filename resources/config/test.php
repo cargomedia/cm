@@ -61,16 +61,18 @@ return function (CM_Config_Node $config) {
                 )
             )
         ));
-
-    $config->services['elasticsearch'] = array(
-        'class'     => 'CM_Elasticsearch_Cluster',
-        'arguments' => array(
-            'servers'  => array(
-                ['host' => 'localhost', 'port' => 9200]
-            ),
-            'disabled' => true,
-        ),
-    );
+    $config->services['elasticsearch'] = [
+        'class'     => CM_Elasticsearch_Factory::class,
+        'method' => [
+            'name' => 'createCluster',
+            'arguments' => [
+                'servers' => [
+                    ['host' => 'localhost', 'port' => 9200],
+                ],
+                'disabled' => true,
+            ],
+        ],
+    ];
 
     $config->services[CM_Jobdistribution_QueueInterface::class] = [
         'class'  => CMTest_Factory_JobDistribution::class,
