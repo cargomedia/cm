@@ -24,7 +24,7 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
         $elasticsearchClient = \Elasticsearch\ClientBuilder::create()->setHosts($hosts)->build();
         //By default it uses RoundRobinSelector and number of retries equals to nodes quantity
 
-        $this->_client = new CM_Elasticsearch_Client($elasticsearchClient);
+        $this->_client = new CM_Elasticsearch_Client($elasticsearchClient, $this->getServiceManager()->getDebug());
     }
 
     /**
@@ -67,15 +67,12 @@ class CM_Elasticsearch_Cluster extends CM_Class_Abstract implements CM_Service_M
         if (!$this->getEnabled()) {
             return array();
         }
-        $this->getServiceManager()->getDebug()->incStats('search', json_encode($data));
-
         $indexNameList = [];
         $typeNameList = [];
         foreach ($types as $type) {
             $indexNameList[] = $type->getIndexName();
             $typeNameList[] = $type->getTypeName();
         }
-
         return $this->getClient()->search($indexNameList, $typeNameList, $data);
     }
 }
