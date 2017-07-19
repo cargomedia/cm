@@ -5,13 +5,18 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
     /** @var string */
     protected $_domain, $_code;
 
+    /** @var int */
+    protected $_timeout;
+
     /**
-     * @param string $domain
-     * @param string $code
+     * @param string   $domain
+     * @param string   $code
+     * @param int|null $timeout
      */
-    public function __construct($domain, $code) {
+    public function __construct($domain, $code, $timeout = null) {
         $this->_domain = (string) $domain;
         $this->_code = (string) $code;
+        $this->_timeout = (int) $timeout;
     }
 
     public function isValid($email) {
@@ -60,7 +65,8 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
         $client = new \GuzzleHttp\Client(['base_uri' => 'http://www.xverify.com']);
         $parameterList = array('email' => $email, 'type' => 'json', 'domain' => $this->_getDomain(), 'apikey' => $this->_getCode());
         $url = '/services/emails/verify/?' . http_build_query($parameterList, '', '&', PHP_QUERY_RFC3986);
-        return $client->get($url);
+        $options = [\GuzzleHttp\RequestOptions::TIMEOUT => $this->_timeout];
+        return $client->get($url, $options);
     }
 
     /**
