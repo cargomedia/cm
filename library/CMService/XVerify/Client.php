@@ -16,6 +16,9 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
     public function __construct($domain, $code, $timeout = null) {
         $this->_domain = (string) $domain;
         $this->_code = (string) $code;
+        if (null === $timeout) {
+            $timeout = 5;
+        }
         $this->_timeout = (int) $timeout;
     }
 
