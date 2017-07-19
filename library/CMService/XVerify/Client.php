@@ -69,7 +69,12 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
         $parameterList = array('email' => $email, 'type' => 'json', 'domain' => $this->_getDomain(), 'apikey' => $this->_getCode());
         $url = '/services/emails/verify/?' . http_build_query($parameterList, '', '&', PHP_QUERY_RFC3986);
         $options = [\GuzzleHttp\RequestOptions::TIMEOUT => $this->_timeout];
-        return $client->get($url, $options);
+        try {
+            $response = $client->get($url, $options);
+        } catch (\GuzzleHttp\Exception\RequestException $exception) {
+            throw new CM_Exception('XVerify timed out', CM_Exception::WARN, ['messageOriginal' => $exception->getMessage()]);
+        }
+        return $response;
     }
 
     /**
