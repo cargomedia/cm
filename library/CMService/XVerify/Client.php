@@ -72,7 +72,7 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
         try {
             $response = $client->get($url, $options);
         } catch (\GuzzleHttp\Exception\RequestException $exception) {
-            throw new CM_Exception('XVerify timed out', CM_Exception::WARN, ['messageOriginal' => $exception->getMessage()]);
+            throw new CM_Exception('XVerify request failed', CM_Exception::WARN, ['messageOriginal' => $exception->getMessage()]);
         }
         return $response;
     }
