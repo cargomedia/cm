@@ -2,6 +2,8 @@
 
 class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
 
+    const TIMEOUT_DEFAULT = 10;
+
     /** @var string */
     protected $_domain, $_code;
 
@@ -17,7 +19,7 @@ class CMService_XVerify_Client extends CM_Service_EmailVerification_Standard {
         $this->_domain = (string) $domain;
         $this->_code = (string) $code;
         if (null === $timeout) {
-            $timeout = 5;
+            $timeout = self::TIMEOUT_DEFAULT;
         }
         $this->_timeout = (int) $timeout;
     }

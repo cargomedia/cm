@@ -3,7 +3,7 @@
 class CM_FormField_EmailTest extends CMTest_TestCase {
 
     public function testValidate() {
-        $field = new CM_FormField_Email(['name' => 'email']);
+        $field = new CM_FormField_Email(['name' => 'email', 'enable-email-verification' => true]);
         $environment = new CM_Frontend_Environment();
         $this->_mockHasMXRecords(true);
         $this->assertSame('test@example.com', $field->validate($environment, 'test@example.com'));
@@ -25,7 +25,7 @@ class CM_FormField_EmailTest extends CMTest_TestCase {
         $emailVerificationDefault = $serviceManager->get('email-verification');
         $serviceManager->unregister('email-verification');
         $serviceManager->registerInstance('email-verification', $emailVerificationMock);
-        $field = new CM_FormField_Email(['name' => 'email', 'disable-email-verification' => true]);
+        $field = new CM_FormField_Email(['name' => 'email']);
         $environment = new CM_Frontend_Environment();
         $this->_mockHasMXRecords(true);
 

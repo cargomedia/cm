@@ -2,6 +2,8 @@
 
 class CMService_KickBox_Client extends CM_Service_EmailVerification_Standard {
 
+    const TIMEOUT_DEFAULT = 10;
+
     /** @var string */
     protected $_code;
 
@@ -11,17 +13,25 @@ class CMService_KickBox_Client extends CM_Service_EmailVerification_Standard {
     /** @var float */
     protected $_disallowUnknownThreshold;
 
+    /** @var int */
+    protected $_timeout;
+
     /**
-     * @param string $code
-     * @param bool   $disallowInvalid
-     * @param bool   $disallowDisposable
-     * @param float  $disallowUnknownThreshold
+     * @param string   $code
+     * @param bool     $disallowInvalid
+     * @param bool     $disallowDisposable
+     * @param float    $disallowUnknownThreshold
+     * @param int|null $timeout
      */
-    public function __construct($code, $disallowInvalid, $disallowDisposable, $disallowUnknownThreshold) {
+    public function __construct($code, $disallowInvalid, $disallowDisposable, $disallowUnknownThreshold, $timeout = null) {
         $this->_code = (string) $code;
         $this->_disallowInvalid = (bool) $disallowInvalid;
         $this->_disallowDisposable = (bool) $disallowDisposable;
         $this->_disallowUnknownThreshold = (float) $disallowUnknownThreshold;
+        if (null === $timeout) {
+            $timeout = self::TIMEOUT_DEFAULT;
+        }
+        $this->_timeout = (int) $timeout;
     }
 
     public function isValid($email) {
@@ -67,7 +77,8 @@ class CMService_KickBox_Client extends CM_Service_EmailVerification_Standard {
      * @throws Exception
      */
     protected function _getResponse($email) {
-        $kickBox = new \Kickbox\Client($this->_getCode(), [\Guzzle\Http\Client::CURL_OPTIONS => [CURLOPT_TIMEOUT => 7]]);
+        $options = [\Guzzle\Http\Client::CURL_OPTIONS => [CURLOPT_TIMEOUT => $this->_timeout]];
+        $kickBox = new \Kickbox\Client($this->_getCode(), $options);
         return $kickBox->kickbox()->verify($email);
     }
 
