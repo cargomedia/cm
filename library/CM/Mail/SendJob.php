@@ -7,10 +7,19 @@ class CM_Mail_SendJob extends CM_Jobdistribution_Job_Abstract {
         $recipient = $params->has('recipient') ? $params->getUser('recipient') : null;
         $mailType = $params->has('mailType') ? $params->getInt('mailType') : null;
         if (!$recipient || !$recipient->getEmailVerified()) {
+            $serviceManager = CM_Service_Manager::getInstance();
             /** @var CM_Service_EmailVerification_ClientInterface $emailVerificationClient */
-            $emailVerificationClient = CM_Service_Manager::getInstance()->get('email-verification', CM_Service_EmailVerification_ClientInterface::class);
+            $emailVerificationClient = $serviceManager->get('email-verification', CM_Service_EmailVerification_ClientInterface::class);
             foreach ($message->getTo() as $address => $name) {
                 if (!$emailVerificationClient->isValid($address)) {
+                    $logger = $serviceManager->getLogger();
+                    $context = new CM_Log_Context();
+                    $context->setExtra([
+                        'email'     => $address,
+                        'mailType'  => $mailType,
+                        'recipient' => $recipient,
+                    ]);
+                    $logger->info('mail.send.rejected', $context);
                     return;
                 }
             }
