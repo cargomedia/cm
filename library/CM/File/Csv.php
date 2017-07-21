@@ -50,6 +50,39 @@ class CM_File_Csv extends CM_File {
     }
 
     /**
+     * @param string|null $lineBreak
+     * @param string|null $delimeter
+     * @param string|null $enclosure
+     * @param string|null $escape
+     * @param int|null $linesToSkip
+     * @return array
+     * @throws CM_Exception_Invalid
+     */
+    public function parse($lineBreak = null, $delimeter = null, $enclosure = null, $escape = null, $linesToSkip = null) {
+        $lineBreak = $lineBreak !== null ? (string) $lineBreak : "\n";
+        $delimeter = $delimeter !== null ? (string) $delimeter : ',';
+        $enclosure = $enclosure !== null ? (string) $enclosure : '"';
+        $escape = $escape !== null ? (string) $escape : "\\";
+        $linesToSkip = $linesToSkip !== null ? (int) $linesToSkip : 1;
+
+        $fileContent = $this->read();
+        $lineList = explode($lineBreak, $fileContent);
+        if (empty($lineList)) {
+            throw new CM_Exception_Invalid('Empty or bad CSV content');
+        }
+        $result = [];
+        $i = 0;
+        foreach ($lineList as $line) {
+            $line = trim($line);
+            if ($i++ < $linesToSkip || empty($line)) {
+                continue;
+            }
+            $result[] = str_getcsv($line, $delimeter, $enclosure, $escape);
+        }
+        return $result;
+    }
+
+    /**
      * @param string[] $row
      * @return string
      */
