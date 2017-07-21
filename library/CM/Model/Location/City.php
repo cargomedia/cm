@@ -86,7 +86,7 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
      * @param string                       $name
      * @param float|null                   $lat
      * @param float|null                   $lon
-     * @param string|null                  $maxMind
+     * @param int|null                     $maxMind
      * @return CM_Model_Location_City
      */
     public static function create(CM_Model_Location_Country $country, CM_Model_Location_State $state = null, $name, $lat = null, $lon = null, $maxMind = null) {
@@ -102,4 +102,19 @@ class CM_Model_Location_City extends CM_Model_Location_Abstract {
         $city->commit();
         return $city;
     }
+
+    /**
+     * @param int $maxMindId
+     * @return CM_Model_Location_City|null
+     */
+    public static function factoryFromMaxMindId($maxMindId) {
+        $locationIdList = CM_Db_Db::select('cm_model_location_city', 'id', [
+            '_maxmind' => (int) $maxMindId,
+        ])->fetchAllColumn();
+        if (empty($locationIdList)) {
+            return null;
+        }
+        return new CM_Model_Location_City(reset($locationIdList));
+    }
+
 }
