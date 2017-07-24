@@ -50,6 +50,47 @@ class CM_File_Csv extends CM_File {
     }
 
     /**
+     * @param int         $headerLinesToSkip
+     * @param string|null $lineBreak
+     * @param string|null $delimiter
+     * @param string|null $enclosure
+     * @param string|null $escape
+     * @return array
+     * @throws CM_Exception_Invalid
+     */
+    public function parse($headerLinesToSkip, $lineBreak = null, $delimiter = null, $enclosure = null, $escape = null) {
+        $headerLinesToSkip = (int) $headerLinesToSkip;
+        $lineBreak = isset($lineBreak) ? (string) $lineBreak : "\n";
+        $delimiter = isset($delimiter) ? (string) $delimiter : ',';
+        $enclosure = isset($enclosure) ? (string) $enclosure : '"';
+        $escape = isset($escape) ? (string) $escape : "\\";
+
+        if (empty($lineBreak)) {
+            throw new CM_Exception_Invalid('Empty linebreak');
+        }
+        if (empty($delimiter)) {
+            throw new CM_Exception_Invalid('Empty delimiter');
+        }
+
+        $fileContent = $this->read();
+        if (empty($fileContent)) {
+            return [];
+        }
+        $lineList = explode($lineBreak, $fileContent);
+
+        $result = [];
+        $i = 0;
+        foreach ($lineList as $line) {
+            $line = trim($line);
+            if ($i++ < $headerLinesToSkip || empty($line)) {
+                continue;
+            }
+            $result[] = str_getcsv($line, $delimiter, $enclosure, $escape);
+        }
+        return $result;
+    }
+
+    /**
      * @param string[] $row
      * @return string
      */
