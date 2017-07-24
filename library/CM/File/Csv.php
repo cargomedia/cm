@@ -54,22 +54,30 @@ class CM_File_Csv extends CM_File {
      * @param string|null $delimeter
      * @param string|null $enclosure
      * @param string|null $escape
-     * @param int|null $linesToSkip
+     * @param int|null    $linesToSkip
      * @return array
      * @throws CM_Exception_Invalid
      */
     public function parse($lineBreak = null, $delimeter = null, $enclosure = null, $escape = null, $linesToSkip = null) {
-        $lineBreak = $lineBreak !== null ? (string) $lineBreak : "\n";
-        $delimeter = $delimeter !== null ? (string) $delimeter : ',';
-        $enclosure = $enclosure !== null ? (string) $enclosure : '"';
-        $escape = $escape !== null ? (string) $escape : "\\";
-        $linesToSkip = $linesToSkip !== null ? (int) $linesToSkip : 1;
+        $lineBreak = isset($lineBreak) ? (string) $lineBreak : "\n";
+        $delimeter = isset($delimeter) ? (string) $delimeter : ',';
+        $enclosure = isset($enclosure) ? (string) $enclosure : '"';
+        $escape = isset($escape) ? (string) $escape : "\\";
+        $linesToSkip = isset($linesToSkip) ? (int) $linesToSkip : 1;
+
+        if (empty($lineBreak)) {
+            throw new CM_Exception_Invalid('Empty linebreak');
+        }
+        if (empty($delimeter)) {
+            throw new CM_Exception_Invalid('Empty delimeter');
+        }
 
         $fileContent = $this->read();
-        $lineList = explode($lineBreak, $fileContent);
-        if (empty($lineList)) {
+        if (empty($fileContent)) {
             throw new CM_Exception_Invalid('Empty or bad CSV content');
         }
+        $lineList = explode($lineBreak, $fileContent);
+
         $result = [];
         $i = 0;
         foreach ($lineList as $line) {
