@@ -74,7 +74,7 @@ class CM_File_Csv extends CM_File {
 
         $fileContent = $this->read();
         if (empty($fileContent)) {
-            throw new CM_Exception_Invalid('Empty or bad CSV content');
+            return [];
         }
         $lineList = explode($lineBreak, $fileContent);
 

@@ -33,10 +33,7 @@ class CM_File_CsvTest extends CMTest_TestCase {
         $mockEmptyFile = $this->mockClass(CM_File_Csv::class)->newInstanceWithoutConstructor();
         $mockEmptyFile->mockMethod('read')->set('');
 
-        $exception = $this->catchException(function () use ($mockEmptyFile) {
-            $mockEmptyFile->parse(0);
-        });
         $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
-        $this->assertSame('Empty or bad CSV content', $exception->getMessage());
+        $this->assertSame([],  $mockEmptyFile->parse(0));
     }
 }
