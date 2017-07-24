@@ -6,7 +6,7 @@ class CM_File_CsvTest extends CMTest_TestCase {
         $path = DIR_TEST_DATA . 'data.csv';
 
         $file = new CM_File_Csv($path);
-        $fileData = $file->parse(null, null, null, null, 2);
+        $fileData = $file->parse(2, null, null, null, null);
 
         $this->assertSame(
             [
@@ -18,22 +18,23 @@ class CM_File_CsvTest extends CMTest_TestCase {
         );
 
         $exception = $this->catchException(function () use ($file) {
-            $file->parse('');
+            $file->parse(1, '');
         });
         $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
         $this->assertSame('Empty linebreak', $exception->getMessage());
 
         $exception = $this->catchException(function () use ($file) {
-            $file->parse(null, '');
+            $file->parse(0, null, '');
         });
         $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
-        $this->assertSame('Empty delimeter', $exception->getMessage());
+        $this->assertSame('Empty delimiter', $exception->getMessage());
 
+        /** @var CM_File_Csv|\Mocka\AbstractClassTrait $mockEmptyFile */
         $mockEmptyFile = $this->mockClass(CM_File_Csv::class)->newInstanceWithoutConstructor();
         $mockEmptyFile->mockMethod('read')->set('');
 
         $exception = $this->catchException(function () use ($mockEmptyFile) {
-            $mockEmptyFile->parse();
+            $mockEmptyFile->parse(0);
         });
         $this->assertInstanceOf(CM_Exception_Invalid::class, $exception);
         $this->assertSame('Empty or bad CSV content', $exception->getMessage());
