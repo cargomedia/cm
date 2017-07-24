@@ -50,7 +50,7 @@ class CM_File_Csv extends CM_File {
     }
 
     /**
-     * @param int         $linesToSkip
+     * @param int         $headerLinesToSkip
      * @param string|null $lineBreak
      * @param string|null $delimiter
      * @param string|null $enclosure
@@ -58,8 +58,8 @@ class CM_File_Csv extends CM_File {
      * @return array
      * @throws CM_Exception_Invalid
      */
-    public function parse($linesToSkip, $lineBreak = null, $delimiter = null, $enclosure = null, $escape = null) {
-        $linesToSkip = (int) $linesToSkip;
+    public function parse($headerLinesToSkip, $lineBreak = null, $delimiter = null, $enclosure = null, $escape = null) {
+        $headerLinesToSkip = (int) $headerLinesToSkip;
         $lineBreak = isset($lineBreak) ? (string) $lineBreak : "\n";
         $delimiter = isset($delimiter) ? (string) $delimiter : ',';
         $enclosure = isset($enclosure) ? (string) $enclosure : '"';
@@ -82,7 +82,7 @@ class CM_File_Csv extends CM_File {
         $i = 0;
         foreach ($lineList as $line) {
             $line = trim($line);
-            if ($i++ < $linesToSkip || empty($line)) {
+            if ($i++ < $headerLinesToSkip || empty($line)) {
                 continue;
             }
             $result[] = str_getcsv($line, $delimiter, $enclosure, $escape);
