@@ -56,4 +56,5 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('Unable to detect location');
     $language->setTranslation('No Internet connection');
     $language->setTranslation('Too long');
+    $language->setTranslation('Click again to confirm');
 };
