@@ -1,0 +1,69 @@
+cm:
+  build:
+    image: cargomedia/cm-ci:v1
+    dockerfile: Dockerfile
+  cached: true
+  volumes:
+    - ./resources/config/_local.docker.php:/app/cm/resources/config/local.docker.php
+    - ./resources/config/_test.docker.php:/app/cm/resources/config/test.docker.php
+  volumes_from:
+      - shared_data
+  links:
+    - mysql
+    - mongo
+    - memcached
+    - elasticsearch
+    - redis
+    - gearman
+
+mysql:
+  image: mysql:5.5.54
+  cached: true
+  environment:
+    MYSQL_ROOT_PASSWORD: docker
+  volumes:
+    - ./docker/config/mysql/conf.d:/etc/mysql/conf.d
+  volumes_from:
+    - shared_data
+
+mongo:
+  image: mongo:2.6.12
+  cached: true
+  command: "--config /mongo/config/mongod.conf"
+  volumes:
+    - ./docker/config/mongo:/mongo/config
+  volumes_from:
+    - shared_data
+
+memcached:
+  image: memcached:1.4
+  cached: true
+  command: "-p 11211 -m 2048 -u memcache -l 0.0.0.0 -c 10000 -v"
+
+elasticsearch:
+  image: elasticsearch:1.3.9
+  volumes:
+    - ./docker/config/elasticsearch:/usr/share/elasticsearch/config
+  volumes_from:
+    - shared_data
+
+redis:
+  image: redis:3.2.6
+  cached: true
+  command: '/redis/config/redis.conf'
+  volumes:
+    - ./docker/config/redis/redis.conf:/redis/config/redis.conf
+  volumes_from:
+    - shared_data
+
+gearman:
+  image: pataquets/gearmand:latest
+  cached: true
+  command: "--job-retries=25 -q libsqlite3 --libsqlite3-db=/gearman/data/db.sqlite3"
+  volumes_from:
+    - shared_data
+
+shared_data:
+  build:
+    image: cargomedia/cm-ci-data:v1
+    dockerfile: Dockerfile.data

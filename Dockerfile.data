@@ -1,0 +1,3 @@
+FROM busybox:latest
+RUN mkdir -p /app/cm/data /usr/share/elasticsearch/data /gearman/data /data/redis /data/db /var/lib/mysql
+VOLUME ["/app/cm/data", "/usr/share/elasticsearch/data", "/gearman/data", "/data/redis/data/db", "/var/lib/mysql"]

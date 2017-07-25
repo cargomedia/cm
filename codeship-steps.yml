@@ -1,0 +1,16 @@
+- type: serial
+  steps:
+    - name: setup
+      service: cm
+      command: ./app-setup.sh
+    - type: parallel
+      steps:
+      - name: "test 1/3"
+        service: cm
+        command: "./test.sh 1/3"
+      - name: "test 2/3"
+        service: cm
+        command: "./test.sh 2/3"
+      - name: "test 3/3"
+        service: cm
+        command: "./test.sh 3/3"
