@@ -64,4 +64,5 @@ return function (CM_Model_Language $language) {
     $language->setTranslation('Day', 'Tag');
     $language->setTranslation('No Internet connection', 'Keine Internetverbindung');
     $language->setTranslation('Too long', 'Zu lang');
+    $language->setTranslation('Click again to confirm', 'Nochmals drücken um zu bestätigen');
 };
