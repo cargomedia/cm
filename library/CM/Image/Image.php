@@ -16,19 +16,18 @@ class CM_Image_Image {
     /** @var int */
     private $_compressionQuality = 80;
 
+    /** @var string|null * */
+    private $_imageContainer;
+
     /**
      * @param string|Imagick $imageContainer
      * @throws CM_Exception
      */
     public function __construct($imageContainer) {
         if (!is_a($imageContainer, 'Imagick')) {
-            $imageContainer = (string) $imageContainer;
             $imagick = new Imagick();
-            try {
-                $imagick->readImageBlob($imageContainer);
-            } catch (ImagickException $e) {
-                throw new CM_Exception_Invalid('Cannot load image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
-            }
+            $this->_imageContainer = (string) $imageContainer;
+            $imagick->pingImageBlob($this->_imageContainer);
         } else {
             $imagick = $imageContainer;
             try {
@@ -52,6 +51,16 @@ class CM_Image_Image {
 
     public function __clone() {
         $this->_imagick = clone $this->_imagick;
+    }
+
+    private function _readImageBlob() {
+        try {
+            if (false === $this->_imagick->readImageBlob($this->_imageContainer)) {
+                throw new ImagickException('Unreadable instance variable containing image blob');
+            }
+        } catch (ImagickException $e) {
+            throw new CM_Exception_Invalid('Cannot load image blob', null, ['originalExceptionMessage' => $e->getMessage()]);
+        }
     }
 
     /**
@@ -103,7 +112,6 @@ class CM_Image_Image {
         if (null === $offsetY) {
             $offsetY = ($this->getHeight() - $height) / 2;
         }
-
         $this->_invokeOnEveryFrame(function (Imagick $frame) use ($width, $height, $offsetX, $offsetY) {
             $frame->cropImage($width, $height, $offsetX, $offsetY);
         });
@@ -340,6 +348,7 @@ class CM_Image_Image {
      * @param Closure $callback
      */
     private function _invokeOnEveryFrame(Closure $callback) {
+        $this->_readImageBlob();
         if (!$this->_getAnimationRequired($this->getFormat())) {
             $callback($this->_imagick);
         } else {
