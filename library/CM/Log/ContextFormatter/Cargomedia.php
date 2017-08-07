@@ -47,7 +47,7 @@ class CM_Log_ContextFormatter_Cargomedia implements CM_Log_ContextFormatter_Inte
         $result = array_merge($result, $this->formatAppContext($context));
 
         if ($exception = $context->getException()) {
-            $serializableException = new CM_ExceptionHandling_SerializableException($exception, true);
+            $serializableException = new CM_ExceptionHandling_SerializableException($exception);
             $stack = $serializableException->getTrace();
             if (!empty($stack)) {
                 $stackAsString = trim(Functional\reduce_left(array_reverse($stack), function ($value, $index, $collection, $reduction) {
