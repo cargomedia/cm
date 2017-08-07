@@ -20,7 +20,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         );
         $clientId = $httpRequest->getClientId();
         $computerInfo = new CM_Log_Context_ComputerInfo('www.example.com', 'v7.0.1');
-        $exception = new CM_Exception_Invalid('Bad', null, ['foo' => 'bar']);
+        $exception = new CM_Exception_Invalid('Bad', null, ['foo' => 'bar', 'bi' => ['bim' => 'bap']]);
 
         $context = new CM_Log_Context();
         $context->setExtra(['bar' => 'baz', 'baz' => 'quux']);
@@ -55,7 +55,7 @@ class CM_Log_ContextFormatter_CargomediaTest extends CMTest_TestCase {
         $this->assertSame('Bad', $formattedContext['exception']['message']);
         $this->assertArrayHasKey('stack', $formattedContext['exception']);
         $this->assertInternalType('string', $formattedContext['exception']['stack']);
-        $this->assertSame(['foo' => "'bar'"], $formattedContext['exception']['metaInfo']);
+        $this->assertSame(['foo' => "'bar'", 'bi' => "['bim' => 'bap']"], $formattedContext['exception']['metaInfo']);
         $this->assertRegExp('/library\/CM\/Log\/ContextFormatter\/CargomediaTest\.php\(\d+\)/', $formattedContext['exception']['stack']);
     }
 }

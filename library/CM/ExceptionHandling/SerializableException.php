@@ -25,9 +25,10 @@ class CM_ExceptionHandling_SerializableException {
 
     /**
      * @param Exception $exception
+     * @param bool|null $recursive
      */
-    public function __construct(Exception $exception) {
-        $this->_extract($exception);
+    public function __construct(Exception $exception, $recursive = null) {
+        $this->_extract($exception, $recursive);
     }
 
     /**
@@ -81,16 +82,20 @@ class CM_ExceptionHandling_SerializableException {
 
     /**
      * @param Exception $exception
+     * @param bool|null $recursive
      */
-    private function _extract(Exception $exception) {
+    private function _extract(Exception $exception, $recursive = null) {
+        $recursive = (bool) $recursive;
         $this->class = get_class($exception);
         $this->message = $exception->getMessage();
         $this->line = $exception->getLine();
         $this->file = $exception->getFile();
         if ($exception instanceof CM_Exception) {
             $variableInspector = new CM_Debug_VariableInspector();
-            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) use ($variableInspector) {
-                return $variableInspector->getDebugInfo($value);
+            $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) use ($variableInspector, $recursive) {
+                return $variableInspector->getDebugInfo($value, [
+                    'recursive' => $recursive,
+                ]);
             });
         }
 
