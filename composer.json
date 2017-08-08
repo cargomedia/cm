@@ -1,5 +1,6 @@
 {
   "name": "cargomedia/cm",
+  "abandoned": true,
   "license": "MIT",
   "config": {
     "bin-dir": "bin/"
