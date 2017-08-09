@@ -90,7 +90,9 @@ class CM_ExceptionHandling_SerializableException {
         if ($exception instanceof CM_Exception) {
             $variableInspector = new CM_Debug_VariableInspector();
             $this->metaInfo = Functional\map($exception->getMetaInfo(), function ($value) use ($variableInspector) {
-                return $variableInspector->getDebugInfo($value);
+                return $variableInspector->getDebugInfo($value, [
+                    'recursive' => true,
+                ]);
             });
         }
 
